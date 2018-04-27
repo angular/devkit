@@ -33,6 +33,7 @@ function updateConfigFile(options: UniversalOptions): Rule {
       throw new SchematicsException('Client app not found.');
     }
     options.test = options.test || clientApp.test;
+    options.root = options.root || clientApp.root;
 
     const tsCfg = options.tsconfigFileName && options.tsconfigFileName.endsWith('.json')
       ? options.tsconfigFileName : `${options.tsconfigFileName}.json`;

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Tree } from '@angular-devkit/schematics';
+import { Tree, move } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 import * as path from 'path';
 import { Schema as ApplicationOptions } from '../application/schema';
@@ -90,6 +90,26 @@ describe('Universal Schematic', () => {
     expect(app.testTsconfig).toEqual('tsconfig.spec.json');
     expect(app.environmentSource).toEqual('environments/environment.ts');
     expect(app.polyfills).not.toBeDefined();
+  });
+
+  it(`should update .angular-cli.json using the client app's root as a default`, async (done) => {
+    const filePath = './.angular-cli.json';
+    const angularCliBuffer = appTree.read(filePath);
+    const existingAngularCliJson = angularCliBuffer && JSON.parse(angularCliBuffer.toString());
+
+    appTree = await schematicRunner.callRule(move('src', 'not-src'), appTree).toPromise();
+    existingAngularCliJson.apps[0].root = 'not-src';
+    appTree.overwrite(filePath, JSON.stringify(existingAngularCliJson, null, 2));
+
+    const tree = schematicRunner.runSchematic('universal', defaultOptions, appTree);
+    const contents = tree.readContent(filePath);
+
+    const config = JSON.parse(contents.toString());
+    expect(config.apps.length).toEqual(2);
+    const app = config.apps[1];
+    expect(app.platform).toEqual('server');
+    expect(app.root).toEqual('not-src');
+    done();
   });
 
   it('should add a server transition to BrowerModule import', () => {

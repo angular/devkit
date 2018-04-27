@@ -28,8 +28,7 @@
     "root": {
       "type": "string",
       "format": "path",
-      "description": "The root directory of the app.",
-      "default": "src"
+      "description": "The root directory of the app."
     },
     "index": {
       "type": "string",
