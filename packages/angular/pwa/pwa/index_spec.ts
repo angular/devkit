@@ -93,7 +93,8 @@ describe('PWA Schematic', () => {
 
     expect(content).toMatch(/<link rel="manifest" href="manifest.json">/);
     expect(content).toMatch(/<meta name="theme-color" content="#1976d2">/);
-    expect(content).toMatch(/<noscript>Please enable Javascript to continue using this application.<\/noscript>/);
+    expect(content)
+      .toMatch(/<noscript>Please enable Javascript to continue using this application.<\/noscript>/);
   });
 
   it('should update the build and test assets configuration', () => {

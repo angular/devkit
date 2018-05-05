@@ -91,7 +91,8 @@ function updateIndexFile(options: PwaOptions): Rule {
       .join('\n');
 
     const bodyTagIndent = getIndent(closingBodyTagLine) + '  ';
-    const itemsToAddToBody = '<noscript>Please enable Javascript to continue using this application.</noscript>'
+    const itemsToAddToBody
+      = '<noscript>Please enable Javascript to continue using this application.</noscript>';
 
     const textToInsertIntoBody = bodyTagIndent + itemsToAddToBody;
 
