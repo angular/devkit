@@ -66,27 +66,41 @@ function updateIndexFile(options: PwaOptions): Rule {
     const lines = content.split('\n');
     let closingHeadTagLineIndex = -1;
     let closingHeadTagLine = '';
-    lines.forEach((line, index) => {
+    let closingBodyTagLineIndex = -1;
+    let closingBodyTagLine = '';
+    lines.forEach((line: string, index: number) => {
       if (/<\/head>/.test(line) && closingHeadTagLineIndex === -1) {
         closingHeadTagLine = line;
         closingHeadTagLineIndex = index;
       }
+
+      if (/<\/body>/.test(line) && closingBodyTagLineIndex === -1) {
+        closingBodyTagLine = line;
+        closingBodyTagLineIndex = index;
+      }
     });
 
-    const indent = getIndent(closingHeadTagLine) + '  ';
-    const itemsToAdd = [
+    const headTagIndent = getIndent(closingHeadTagLine) + '  ';
+    const itemsToAddToHead = [
       '<link rel="manifest" href="manifest.json">',
       '<meta name="theme-color" content="#1976d2">',
     ];
 
-    const textToInsert = itemsToAdd
-      .map(text => indent + text)
+    const textToInsertIntoHead = itemsToAddToHead
+      .map(text => headTagIndent + text)
       .join('\n');
+
+    const bodyTagIndent = getIndent(closingBodyTagLine) + '  ';
+    const itemsToAddToBody = '<noscript>Please enable Javascript to continue using this application.</noscript>'
+
+    const textToInsertIntoBody = bodyTagIndent + itemsToAddToBody;
 
     const updatedIndex = [
       ...lines.slice(0, closingHeadTagLineIndex),
-      textToInsert,
-      ...lines.slice(closingHeadTagLineIndex),
+      textToInsertIntoHead,
+      ...lines.slice(closingHeadTagLineIndex, closingBodyTagLineIndex),
+      textToInsertIntoBody,
+      ...lines.slice(closingBodyTagLineIndex),
     ].join('\n');
 
     host.overwrite(path, updatedIndex);
