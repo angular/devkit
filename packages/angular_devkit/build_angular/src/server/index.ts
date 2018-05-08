@@ -85,7 +85,14 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
         };
 
         try {
-          webpackCompiler.run(callback);
+          if (options.watch) {
+            const watching = webpackCompiler.watch({ poll: options.poll }, callback);
+
+            // Teardown logic. Close the watcher when unsubscribed from.
+            return () => watching.close(() => { });
+          } else {
+            webpackCompiler.run(callback);
+          }
         } catch (err) {
           if (err) {
             this.context.logger.error(
