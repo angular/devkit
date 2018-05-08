@@ -117,6 +117,14 @@ export interface BuildWebpackServerSchema {
    * Use file name for lazy loaded chunks.
    */
   namedChunks?: boolean;
+  /**
+   * Run build when files change.
+   */
+  watch?: boolean;
+    /**
+   * Enable and define the file watching poll time period in milliseconds.
+   */
+  poll?: number;
 }
 
 /**
