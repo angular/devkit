@@ -162,6 +162,9 @@
     "zone.js": "^0.8.19"
   },
   "devDependencies": {
+    "conventional-commits-parser": "^2.1.7",
+    "gh-got": "^7.0.0",
+    "git-raw-commits": "^1.3.6",
     "license-checker": "^16.0.0",
     "tslint-no-circular-imports": "^0.3.0"
   }
