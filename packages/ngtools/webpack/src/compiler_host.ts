@@ -232,12 +232,11 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     return stats.content;
   }
 
-  // Does not delegate, use with `fileExists/directoryExists()`.
-  stat(path: string): VirtualStats {
+  stat(path: string): VirtualStats | null {
     const p = this.resolve(path);
     const stats = this._files[p] || this._directories[p];
     if (!stats) {
-      throw new Error(`File not found: ${JSON.stringify(p)}`);
+      return this._syncHost.stat(p) as VirtualStats | null;
     }
 
     return stats;
