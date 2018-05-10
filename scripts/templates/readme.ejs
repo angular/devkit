@@ -82,6 +82,9 @@ for (const pkgName of Object.keys(packages)) {
   %> | [![latest](https://img.shields.io/npm/v/<%= encode(pkgName) %>/latest.svg)](https://npmjs.com/package/<%= pkgName %>)<%
   %> | <% for (const link of mrPkg.links || []) {
     %>[![<%= link.label %>](https://img.shields.io/badge/<%= link.label %>--<%= link.color || 'green' %>.svg)](<%= link.url %>)<%
+  } 
+  if (mrPkg.snapshotRepo) { 
+    %> [![snapshot](https://img.shields.io/badge/snapshot--blue.svg)](https://github.com/<%= mrPkg.snapshotRepo %>)<%
   } %>
 <% } %>
 <% } %>
