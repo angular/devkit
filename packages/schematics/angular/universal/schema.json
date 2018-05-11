@@ -61,5 +61,6 @@
   },
   "required": [
     "clientProject"
-  ]
+  ],
+  "additionalProperties": false
 }

@@ -70,5 +70,6 @@
   "required": [
     "name",
     "version"
-  ]
+  ],
+  "additionalProperties": false
 }

@@ -100,5 +100,6 @@
       "description": "Specifies if declaring module exports the component."
     }
   },
-  "required": []
+  "required": [],
+  "additionalProperties": false
 }

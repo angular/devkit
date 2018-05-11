@@ -17,9 +17,6 @@
       "description": "Route path used to produce the app shell.",
       "default": "shell"
     },
-
-
-
     "name": {
       "type": "string",
       "format": "html-selector",
@@ -101,5 +98,6 @@
   "required": [
     "clientProject",
     "universalProject"
-  ]
+  ],
+  "additionalProperties": false
 }
