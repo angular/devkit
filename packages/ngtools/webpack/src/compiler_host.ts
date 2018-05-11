@@ -74,25 +74,61 @@ export class VirtualDirStats extends VirtualStats {
 
 export class VirtualFileStats extends VirtualStats {
   private _sourceFile: ts.SourceFile | null;
-  constructor(_fileName: string, private _content: string) {
+  private _content: string | null;
+  private _bufferContent: virtualFs.FileBuffer | null;
+
+  constructor(_fileName: string) {
     super(_fileName);
   }
 
-  get content() { return this._content; }
+  static createFromString(_fileName: string, _content: string) {
+    const stats = new VirtualFileStats(_fileName);
+    stats.content = _content;
+
+    return stats;
+  }
+
+  static createFromBuffer(_fileName: string, _buffer: virtualFs.FileBuffer) {
+    const stats = new VirtualFileStats(_fileName);
+    stats.bufferContent = _buffer;
+
+    return stats;
+  }
+
+  get content() {
+    if (!this._content && this.bufferContent) {
+      this._content = virtualFs.fileBufferToString(this.bufferContent);
+    }
+
+    return this._content || '';
+  }
   set content(v: string) {
     this._content = v;
-    this._mtime = new Date();
-    this._sourceFile = null;
+    this._bufferContent = null;
+    this.resetMetadata();
   }
+
+  get bufferContent() {
+    if (!this._bufferContent && this._content) {
+      this._bufferContent = virtualFs.stringToFileBuffer(this._content);
+    }
+
+    return this._bufferContent || virtualFs.stringToFileBuffer('');
+  }
+  set bufferContent(buf: virtualFs.FileBuffer) {
+    this._bufferContent = buf;
+    this._content = null;
+    this.resetMetadata();
+  }
+
   setSourceFile(sourceFile: ts.SourceFile) {
     this._sourceFile = sourceFile;
   }
   getSourceFile(languageVersion: ts.ScriptTarget, setParentNodes: boolean) {
     if (!this._sourceFile) {
-      // console.log(this._path)
       this._sourceFile = ts.createSourceFile(
         workaroundResolve(this._path),
-        this._content,
+        this.content,
         languageVersion,
         setParentNodes);
     }
@@ -100,11 +136,15 @@ export class VirtualFileStats extends VirtualStats {
     return this._sourceFile;
   }
 
+  private resetMetadata(): void {
+    this._mtime = new Date();
+    this._sourceFile = null;
+  }
+
   isFile() { return true; }
 
-  get size() { return this._content.length; }
+  get size() { return this.content.length; }
 }
-
 
 export class WebpackCompilerHost implements ts.CompilerHost {
   private _syncHost: virtualFs.SyncDelegateHost;
@@ -149,8 +189,8 @@ export class WebpackCompilerHost implements ts.CompilerHost {
     }
   }
 
-  private _setFileContent(fileName: Path, content: string) {
-    this._files[fileName] = new VirtualFileStats(fileName, content);
+  private _cacheFile(fileName: string, stats: VirtualFileStats) {
+    this._files[fileName] = stats;
 
     let p = dirname(fileName);
     while (p && !this._directories[p]) {
@@ -211,25 +251,41 @@ export class WebpackCompilerHost implements ts.CompilerHost {
   }
 
   readFile(fileName: string): string | undefined {
+    const stats = this.findVirtualFile(fileName);
+
+    return stats && stats.content;
+  }
+
+  readFileBuffer(fileName: string): Buffer | undefined {
+    const stats = this.findVirtualFile(fileName);
+    if (stats) {
+      const buffer = Buffer.from(stats.bufferContent);
+
+      return buffer;
+    }
+  }
+
+  private findVirtualFile(fileName: string): VirtualFileStats | undefined {
     const p = this.resolve(fileName);
 
     const stats = this._files[p];
-    if (!stats) {
-      try {
-        const result = virtualFs.fileBufferToString(this._syncHost.read(p));
-        if (result !== undefined) {
-          if (this._cache) {
-            this._setFileContent(p, result);
-          }
-        }
-
-        return result;
-      } catch (e) {
-        return undefined;
-      }
+    if (stats) {
+      return stats;
     }
 
-    return stats.content;
+    try {
+      const fileBuffer = this._syncHost.read(p);
+      if (fileBuffer) {
+        const stats = VirtualFileStats.createFromBuffer(p, fileBuffer);
+        if (this._cache) {
+          this._cacheFile(p, stats);
+        }
+
+        return stats;
+      }
+    } catch (e) {
+      return undefined;
+    }
   }
 
   stat(path: string): VirtualStats | null {
@@ -344,7 +400,8 @@ export class WebpackCompilerHost implements ts.CompilerHost {
       _sourceFiles?: ReadonlyArray<ts.SourceFile>,
     ): void => {
       const p = this.resolve(fileName);
-      this._setFileContent(p, data);
+      const stats = VirtualFileStats.createFromString(p, data);
+      this._cacheFile(p, stats);
     };
   }
 
