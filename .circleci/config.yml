@@ -3,13 +3,13 @@ version: 2
 _defaults: &defaults
   working_directory: ~/ng
   docker:
-    - image: angular/ngcontainer:0.1.0
+    - image: angular/ngcontainer:0.3.0
 
 _post_checkout: &post_checkout
   post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
 
 _root_package_lock_key: &_root_package_lock_key
-  key: angular_devkit-{{ checksum "package-lock.json" }}
+  key: angular_devkit-{{ checksum "package-lock.json" }}-0.3.0
 
 jobs:
   install:
@@ -46,6 +46,7 @@ jobs:
 
   test-large:
     <<: *defaults
+    resource_class: large
     steps:
       - checkout: *post_checkout
       - restore_cache: *_root_package_lock_key
