@@ -105,5 +105,6 @@
       "description": "Specifies if the component is an entry component of declaring module."
     }
   },
-  "required": []
+  "required": [],
+  "additionalProperties": false
 }

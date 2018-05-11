@@ -36,5 +36,6 @@
       "description": "Specifies if a spec file is generated."
     }
   },
-  "required": []
+  "required": [],
+  "additionalProperties": false
 }

@@ -101,7 +101,7 @@ describe('Library Schematic', () => {
 
   it('should set the prefix correctly', () => {
     const options = { ...defaultOptions, prefix: 'pre' };
-    const tree = schematicRunner.runSchematic('application', options, workspaceTree);
+    const tree = schematicRunner.runSchematic('library', options, workspaceTree);
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
     expect(workspace.projects.foo.prefix).toEqual('pre');

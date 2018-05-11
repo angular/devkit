@@ -17,7 +17,6 @@ import {
 import * as ts from 'typescript';
 import {
   WorkspaceProject,
-  WorkspaceSchema,
   WorkspaceTool,
 } from '../../../angular_devkit/core/src/workspace/workspace-schema';
 import { Schema as ComponentOptions } from '../component/schema';
@@ -171,12 +170,16 @@ function addUniversalTarget(options: AppShellOptions): Rule {
     // Copy options.
     const universalOptions = {
       ...options,
-      name: options.universalProject,
     };
 
     // Delete non-universal options.
     delete universalOptions.universalProject;
     delete universalOptions.route;
+    delete universalOptions.name;
+    delete universalOptions.outDir;
+    delete universalOptions.root;
+    delete universalOptions.index;
+    delete universalOptions.sourceDir;
 
     return schematic('universal', universalOptions)(host, context);
   };
