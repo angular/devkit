@@ -54,6 +54,6 @@ describe('Dev Server Builder proxy', () => {
     const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: '../proxy.config.json' };
 
     runTargetSpec(host, devServerTargetSpec, overrides)
-      .subscribe(undefined, done, done.fail);
+      .subscribe(undefined, () => done(), done.fail);
   }, 30000);
 });

@@ -69,7 +69,7 @@ describe('Browser Builder assets', () => {
       }],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, done, done.fail);
+    runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, () => done(), done.fail);
 
     // The node_modules folder must be deleted, otherwise code that tries to find the
     // node_modules folder will hit this one and can fail.
@@ -85,7 +85,7 @@ describe('Browser Builder assets', () => {
       assets: ['not-source-root/file.txt'],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, done, done.fail);
+    runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, () => done(), done.fail);
 
     // The node_modules folder must be deleted, otherwise code that tries to find the
     // node_modules folder will hit this one and can fail.

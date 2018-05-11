@@ -164,6 +164,6 @@ describe('Tslint Target', () => {
     };
 
     runTargetSpec(host, tslintTargetSpec, overrides).pipe(
-    ).subscribe(undefined, done, done.fail);
+    ).subscribe(undefined, () => done(), done.fail);
   }, 30000);
 });

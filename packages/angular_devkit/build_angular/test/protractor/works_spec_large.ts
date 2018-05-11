@@ -33,7 +33,7 @@ describe('Protractor Builder', () => {
 
     runTargetSpec(host, protractorTargetSpec, overrides).pipe(
       // This should fail because no server is available for connection.
-    ).subscribe(undefined, done, done.fail);
+    ).subscribe(undefined, () => done(), done.fail);
   }, 30000);
 
   linuxOnlyIt('overrides protractor specs', (done) => {

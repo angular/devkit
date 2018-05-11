@@ -47,7 +47,7 @@ describe('Browser Builder', () => {
     runTargetSpec(host, browserTargetSpec, overrides)
       .subscribe(event => {
         expect(event.success).toBe(false);
-      }, done, done.fail);
+      }, () => done(), done.fail);
   }, Timeout.Basic);
 
   it('works with service worker', (done) => {

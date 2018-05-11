@@ -37,6 +37,6 @@ describe('Browser Builder output path', () => {
   it('does not allow output path to be project root', (done) => {
     const overrides = { outputPath: './' };
 
-    runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, done, done.fail);
+    runTargetSpec(host, browserTargetSpec, overrides).subscribe(undefined, () => done(), done.fail);
   }, Timeout.Basic);
 });
