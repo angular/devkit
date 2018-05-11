@@ -23,15 +23,6 @@ import {
 import { resolve as nodeResolve } from '@angular-devkit/core/node';
 import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { concatMap, map, tap } from 'rxjs/operators';
-import {
-  BuildEvent,
-  Builder,
-  BuilderConstructor,
-  BuilderContext,
-  BuilderDescription,
-  BuilderPaths,
-  BuilderPathsMap,
-} from './builder';
 
 export class ProjectNotFoundException extends BaseException {
   constructor(projectName: string) {
@@ -66,6 +57,44 @@ export class BuilderNotFoundException extends BaseException {
   constructor(builder: string) {
     super(`Builder ${builder} could not be found.`);
   }
+}
+
+export interface BuilderContext {
+  logger: logging.Logger;
+  host: virtualFs.Host<{}>;
+  workspace: experimental.workspace.Workspace;
+  architect: Architect;
+}
+
+// TODO: use Build Event Protocol
+// https://docs.bazel.build/versions/master/build-event-protocol.html
+// https://github.com/googleapis/googleapis/tree/master/google/devtools/build/v1
+export interface BuildEvent {
+  success: boolean;
+}
+
+export interface Builder<OptionsT> {
+  run(builderConfig: BuilderConfiguration<Partial<OptionsT>>): Observable<BuildEvent>;
+}
+
+export interface BuilderPathsMap {
+  builders: { [k: string]: BuilderPaths };
+}
+
+export interface BuilderPaths {
+  class: Path;
+  schema: Path;
+  description: string;
+}
+
+export interface BuilderDescription {
+  name: string;
+  schema: JsonObject;
+  description: string;
+}
+
+export interface BuilderConstructor<OptionsT> {
+  new(context: BuilderContext): Builder<OptionsT>;
 }
 
 export interface BuilderConfiguration<OptionsT = {}> {

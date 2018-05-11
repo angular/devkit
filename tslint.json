@@ -1,4 +1,5 @@
 {
+  "extends": "tslint-no-circular-imports",
   "rulesDirectory": [
     "dist/rules"
   ],

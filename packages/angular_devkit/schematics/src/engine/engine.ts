@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException, logging } from '@angular-devkit/core';
+import { BaseException, PriorityQueue, logging } from '@angular-devkit/core';
 import { Observable, from as observableFrom } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 import { Url } from 'url';
@@ -13,24 +13,23 @@ import { MergeStrategy } from '../tree/interface';
 import { NullTree } from '../tree/null';
 import { empty } from '../tree/static';
 import { Workflow } from '../workflow';
-import { CollectionImpl } from './collection';
 import {
   Collection,
   CollectionDescription,
   Engine,
   EngineHost,
   Schematic,
+  SchematicContext,
   SchematicDescription,
   Source,
-  TypedSchematicContext,
-} from './interface';
-import { SchematicImpl } from './schematic';
-import {
+  TaskConfiguration,
   TaskConfigurationGenerator,
   TaskExecutor,
   TaskId,
-  TaskScheduler,
-} from './task';
+  TaskInfo,
+  TypedSchematicContext,
+} from './interface';
+import { SchematicImpl } from './schematic';
 
 
 export class UnknownUrlSourceProtocol extends BaseException {
@@ -69,6 +68,95 @@ export class UnregisteredTaskException extends BaseException {
     super(`Unregistered task "${name}"${addendum}.`);
   }
 }
+
+export class UnknownTaskDependencyException extends BaseException {
+  constructor(id: TaskId) {
+    super(`Unknown task dependency [ID: ${id.id}].`);
+  }
+}
+
+export class CollectionImpl<CollectionT extends object, SchematicT extends object>
+  implements Collection<CollectionT, SchematicT> {
+  constructor(private _description: CollectionDescription<CollectionT>,
+              private _engine: SchematicEngine<CollectionT, SchematicT>,
+              public readonly baseDescriptions?: Array<CollectionDescription<CollectionT>>) {
+  }
+
+  get description() { return this._description; }
+  get name() { return this.description.name || '<unknown>'; }
+
+  createSchematic(name: string, allowPrivate = false): Schematic<CollectionT, SchematicT> {
+    return this._engine.createSchematic(name, this, allowPrivate);
+  }
+
+  listSchematicNames(): string[] {
+    return this._engine.listSchematicNames(this);
+  }
+}
+
+export class TaskScheduler {
+  private _queue = new PriorityQueue<TaskInfo>((x, y) => x.priority - y.priority);
+  private _taskIds = new Map<TaskId, TaskInfo>();
+  private static _taskIdCounter = 1;
+
+  constructor(private _context: SchematicContext) {}
+
+  private _calculatePriority(dependencies: Set<TaskInfo>): number {
+    if (dependencies.size === 0) {
+      return 0;
+    }
+
+    const prio = [...dependencies].reduce((prio, task) => prio + task.priority, 1);
+
+    return prio;
+  }
+
+  private _mapDependencies(dependencies?: Array<TaskId>): Set<TaskInfo> {
+    if (!dependencies) {
+      return new Set();
+    }
+
+    const tasks = dependencies.map(dep => {
+      const task = this._taskIds.get(dep);
+      if (!task) {
+        throw new UnknownTaskDependencyException(dep);
+      }
+
+      return task;
+    });
+
+    return new Set(tasks);
+  }
+
+  schedule<T>(taskConfiguration: TaskConfiguration<T>): TaskId {
+    const dependencies = this._mapDependencies(taskConfiguration.dependencies);
+    const priority = this._calculatePriority(dependencies);
+
+    const task = {
+      id: TaskScheduler._taskIdCounter++,
+      priority,
+      configuration: taskConfiguration,
+      context: this._context,
+    };
+
+    this._queue.push(task);
+
+    const id = { id: task.id };
+    this._taskIds.set(id, task);
+
+    return id;
+  }
+
+  finalize(): ReadonlyArray<TaskInfo> {
+    const tasks = this._queue.toArray();
+    this._queue.clear();
+    this._taskIds.clear();
+
+    return tasks;
+  }
+
+}
+
 
 export class SchematicEngine<CollectionT extends object, SchematicT extends object>
     implements Engine<CollectionT, SchematicT> {

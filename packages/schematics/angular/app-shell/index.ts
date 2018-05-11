@@ -27,12 +27,12 @@ import {
   findNode,
   getDecoratorMetadata,
   getSourceNodes,
+  insertImport,
   isImported,
 } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import { getWorkspace, getWorkspacePath } from '../utility/config';
 import { getAppModulePath } from '../utility/ng-ast-utils';
-import { insertImport } from '../utility/route-utils';
 import { Schema as AppShellOptions } from './schema';
 
 

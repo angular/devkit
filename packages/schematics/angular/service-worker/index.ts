@@ -20,14 +20,13 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as ts from 'typescript';
-import { addSymbolToNgModuleMetadata, isImported } from '../utility/ast-utils';
+import { addSymbolToNgModuleMetadata, insertImport, isImported } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import {
   getWorkspace,
   getWorkspacePath,
 } from '../utility/config';
 import { getAppModulePath } from '../utility/ng-ast-utils';
-import { insertImport } from '../utility/route-utils';
 import { Schema as ServiceWorkerOptions } from './schema';
 
 const packageJsonPath = '/package.json';

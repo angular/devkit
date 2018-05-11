@@ -162,6 +162,7 @@
     "zone.js": "^0.8.19"
   },
   "devDependencies": {
-    "license-checker": "^16.0.0"
+    "license-checker": "^16.0.0",
+    "tslint-no-circular-imports": "^0.3.0"
   }
 }
