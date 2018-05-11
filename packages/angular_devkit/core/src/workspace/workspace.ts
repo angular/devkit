@@ -8,20 +8,22 @@
 
 import { Observable, of, throwError } from 'rxjs';
 import { concatMap, map, tap } from 'rxjs/operators';
+import { BaseException } from '../exception/exception';
 import {
   JsonObject,
   JsonParseMode,
+  parseJson,
+  schema,
+} from '../json';
+import {
   Path,
   isAbsolute,
   join,
   normalize,
-  parseJson,
   relative,
   resolve,
-  schema,
   virtualFs,
-} from '..';
-import { BaseException } from '../exception/exception';
+} from '../virtual-fs';
 import { WorkspaceProject, WorkspaceSchema, WorkspaceTool } from './workspace-schema';
 
 
