@@ -11,7 +11,7 @@ import {
   FileDoesNotExistException,
   PathIsDirectoryException,
   PathIsFileException,
-} from '../../exception/exception';
+} from '../../exception';
 import {
   NormalizedRoot,
   NormalizedSep,

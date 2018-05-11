@@ -8,7 +8,7 @@
 
 import { Observable, of, throwError } from 'rxjs';
 import { concatMap, map, tap } from 'rxjs/operators';
-import { BaseException } from '../exception/exception';
+import { BaseException } from '../exception';
 import {
   JsonObject,
   JsonParseMode,

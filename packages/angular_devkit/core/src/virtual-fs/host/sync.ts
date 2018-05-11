@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Observable } from 'rxjs';
-import { BaseException } from '../../exception/exception';
+import { BaseException } from '../../exception';
 import { Path, PathFragment } from '../path';
 import {
   FileBuffer,
