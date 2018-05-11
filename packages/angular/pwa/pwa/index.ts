@@ -28,7 +28,12 @@ function addServiceWorker(options: PwaOptions): Rule {
   return (host: Tree, context: SchematicContext) => {
     context.logger.debug('Adding service worker...');
 
-    return externalSchematic('@schematics/angular', 'service-worker', options)(host, context);
+    const swOptions = {
+      ...options,
+    };
+    delete swOptions.title;
+
+    return externalSchematic('@schematics/angular', 'service-worker', swOptions)(host, context);
   };
 }
 
