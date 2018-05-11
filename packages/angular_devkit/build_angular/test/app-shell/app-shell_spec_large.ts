@@ -5,9 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, host, runTargetSpec } from '../utils';
+import { Timeout, host, workspaceRoot } from '../utils';
 
 
 describe('AppShell Builder', () => {
@@ -37,7 +38,7 @@ describe('AppShell Builder', () => {
       `,
     });
 
-    runTargetSpec(host, { project: 'app', target: 'app-shell' }).pipe(
+    runTargetSpec(workspaceRoot, host, { project: 'app', target: 'app-shell' }).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = 'dist/index.html';

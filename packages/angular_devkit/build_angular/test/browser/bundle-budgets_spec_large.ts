@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { TestLogger, Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder bundle budgets', () => {
@@ -23,7 +24,7 @@ describe('Browser Builder bundle budgets', () => {
 
     const logger = new TestLogger('rebuild-type-errors');
 
-    runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('WARNING')).toBe(false)),
     ).toPromise().then(done, done.fail);
@@ -35,7 +36,7 @@ describe('Browser Builder bundle budgets', () => {
       budgets: [{ type: 'all', maximumError: '100b' }],
     };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
@@ -48,7 +49,7 @@ describe('Browser Builder bundle budgets', () => {
 
     const logger = new TestLogger('rebuild-type-errors');
 
-    runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('WARNING')).toBe(true)),
     ).toPromise().then(done, done.fail);

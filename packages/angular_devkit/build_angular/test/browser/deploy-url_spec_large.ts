@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { concatMap, tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder deploy url', () => {
@@ -20,14 +21,14 @@ describe('Browser Builder deploy url', () => {
   it('uses deploy url for bundles urls', (done) => {
     const overrides = { deployUrl: 'deployUrl/' };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'index.html');
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toContain('deployUrl/main.js');
       }),
-      concatMap(() => runTargetSpec(host, browserTargetSpec,
+      concatMap(() => runTargetSpec(workspaceRoot, host, browserTargetSpec,
         { deployUrl: 'http://example.com/some/path/' })),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
@@ -41,7 +42,7 @@ describe('Browser Builder deploy url', () => {
   it('uses deploy url for in webpack runtime', (done) => {
     const overrides = { deployUrl: 'deployUrl/' };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'runtime.js');

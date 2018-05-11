@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { request, runTargetSpec } from '@angular-devkit/architect/testing';
 import { from } from 'rxjs';
 import { concatMap, take, tap } from 'rxjs/operators';
 import { DevServerBuilderOptions } from '../../src';
-import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
+import { devServerTargetSpec, host, workspaceRoot } from '../utils';
 
 
 describe('Dev Server Builder serve path', () => {
@@ -20,7 +21,7 @@ describe('Dev Server Builder serve path', () => {
   it('works', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { servePath: 'test/' };
 
-    runTargetSpec(host, devServerTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => from(request('http://localhost:4200/test/'))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),

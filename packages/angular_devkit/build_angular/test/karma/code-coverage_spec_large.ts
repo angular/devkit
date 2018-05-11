@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, tap } from 'rxjs/operators';
 import { NormalizedKarmaBuilderSchema } from '../../src';
-import { host, karmaTargetSpec, runTargetSpec } from '../utils';
+import { host, karmaTargetSpec, workspaceRoot } from '../utils';
 
 
 describe('Karma Builder code coverage', () => {
@@ -21,7 +22,7 @@ describe('Karma Builder code coverage', () => {
   it('works', (done) => {
     const overrides: Partial<NormalizedKarmaBuilderSchema> = { codeCoverage: true };
 
-    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, karmaTargetSpec, overrides).pipe(
       // It seems like the coverage files take a while being written to disk, so we wait 500ms here.
       debounceTime(500),
       tap(buildEvent => {
@@ -43,7 +44,7 @@ describe('Karma Builder code coverage', () => {
       ],
     };
 
-    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, karmaTargetSpec, overrides).pipe(
       // It seems like the coverage files take a while being written to disk, so we wait 500ms here.
       debounceTime(500),
       tap(buildEvent => {

@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize } from '@angular-devkit/core';
 import { retry } from 'rxjs/operators';
-import { host, protractorTargetSpec, runTargetSpec } from '../utils';
+import { host, protractorTargetSpec, workspaceRoot } from '../utils';
 
 
 describe('Protractor Builder', () => {
@@ -24,7 +25,7 @@ describe('Protractor Builder', () => {
   it('works with no devServerTarget', (done) => {
     const overrides = { devServerTarget: undefined };
 
-    runTargetSpec(host, protractorTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, protractorTargetSpec, overrides).pipe(
       // This should fail because no server is available for connection.
     ).subscribe(undefined, () => done(), done.fail);
   }, 30000);
@@ -35,7 +36,7 @@ describe('Protractor Builder', () => {
 
     const overrides = { specs: ['./e2e/renamed-app.e2e-spec.ts'] };
 
-    runTargetSpec(host, protractorTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, protractorTargetSpec, overrides).pipe(
       retry(3),
     ).toPromise().then(done, done.fail);
   }, 60000);
@@ -54,7 +55,7 @@ describe('Protractor Builder', () => {
 
     const overrides = { suite: 'app' };
 
-    runTargetSpec(host, protractorTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, protractorTargetSpec, overrides).pipe(
       retry(3),
     ).toPromise().then(done, done.fail);
   }, 60000);

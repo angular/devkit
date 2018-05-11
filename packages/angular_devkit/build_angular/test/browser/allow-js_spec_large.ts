@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder allow js', () => {
@@ -23,7 +24,7 @@ describe('Browser Builder allow js', () => {
     // TODO: this test originally edited tsconfig to have `"allowJs": true` but works without it.
     // Investigate.
 
-    runTargetSpec(host, browserTargetSpec).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
@@ -36,7 +37,7 @@ describe('Browser Builder allow js', () => {
 
     const overrides = { aot: true };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);

@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { host, karmaTargetSpec, runTargetSpec } from '../utils';
+import { host, karmaTargetSpec, workspaceRoot } from '../utils';
 
 
 describe('Karma Builder assets', () => {
@@ -99,7 +100,7 @@ describe('Karma Builder assets', () => {
       ],
     };
 
-    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, karmaTargetSpec, overrides).pipe(
       tap(buildEvent => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, 45000);

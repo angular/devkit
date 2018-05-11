@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder no entry module', () => {
@@ -21,7 +22,7 @@ describe('Browser Builder no entry module', () => {
 
     const overrides = { baseHref: '/myUrl' };
 
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);

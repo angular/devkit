@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { request, runTargetSpec } from '@angular-devkit/architect/testing';
 import { from } from 'rxjs';
 import { concatMap, take, tap } from 'rxjs/operators';
 import { DevServerBuilderOptions } from '../../src';
-import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
+import { devServerTargetSpec, host, workspaceRoot } from '../utils';
 
 
 describe('Dev Server Builder public host', () => {
@@ -21,7 +22,7 @@ describe('Dev Server Builder public host', () => {
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
-    runTargetSpec(host, devServerTargetSpec).pipe(
+    runTargetSpec(workspaceRoot, host, devServerTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => from(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('Invalid Host header')),
@@ -32,7 +33,7 @@ describe('Dev Server Builder public host', () => {
   it('works', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { publicHost: headers.host };
 
-    runTargetSpec(host, devServerTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => from(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
@@ -43,7 +44,7 @@ describe('Dev Server Builder public host', () => {
   it('works', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { disableHostCheck: true };
 
-    runTargetSpec(host, devServerTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => from(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),

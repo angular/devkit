@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { TestLogger, Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder errors', () => {
@@ -21,7 +22,7 @@ describe('Browser Builder errors', () => {
     `);
     const logger = new TestLogger('errors-compilation');
 
-    runTargetSpec(host, browserTargetSpec, undefined, logger).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, undefined, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('polyfills.ts is missing from the TypeScript')).toBe(true);
@@ -33,7 +34,7 @@ describe('Browser Builder errors', () => {
     host.appendToFile('src/app/app.component.ts', ']]]');
     const logger = new TestLogger('errors-syntax');
 
-    runTargetSpec(host, browserTargetSpec, undefined, logger).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, undefined, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('Declaration or statement expected.')).toBe(true);
@@ -45,7 +46,7 @@ describe('Browser Builder errors', () => {
     host.replaceInFile('src/app/app.component.ts', `'app-root'`, `(() => 'app-root')()`);
     const logger = new TestLogger('errors-static');
 
-    runTargetSpec(host, browserTargetSpec, { aot: true }, logger).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, { aot: true }, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('Function expressions are not supported in')).toBe(true);

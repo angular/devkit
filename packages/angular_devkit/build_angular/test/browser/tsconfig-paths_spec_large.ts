@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder tsconfig paths', () => {
@@ -25,7 +26,7 @@ describe('Browser Builder tsconfig paths', () => {
       },
     `);
 
-    runTargetSpec(host, browserTargetSpec).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
@@ -67,7 +68,7 @@ describe('Browser Builder tsconfig paths', () => {
       console.log(meaning5)
     `);
 
-    runTargetSpec(host, browserTargetSpec).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);

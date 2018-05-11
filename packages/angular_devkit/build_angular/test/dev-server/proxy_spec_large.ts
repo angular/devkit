@@ -6,12 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { request, runTargetSpec } from '@angular-devkit/architect/testing';
 import * as express from 'express'; // tslint:disable-line:no-implicit-dependencies
 import * as http from 'http';
 import { from } from 'rxjs';
 import { concatMap, take, tap } from 'rxjs/operators';
 import { DevServerBuilderOptions } from '../../src';
-import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
+import { devServerTargetSpec, host, workspaceRoot } from '../utils';
 
 
 describe('Dev Server Builder proxy', () => {
@@ -39,7 +40,7 @@ describe('Dev Server Builder proxy', () => {
 
     const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: 'proxy.config.json' };
 
-    runTargetSpec(host, devServerTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => from(request('http://localhost:4200/api/test'))),
       tap(response => {
@@ -53,7 +54,7 @@ describe('Dev Server Builder proxy', () => {
   it('errors out with a missing proxy file', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { proxyConfig: '../proxy.config.json' };
 
-    runTargetSpec(host, devServerTargetSpec, overrides)
+    runTargetSpec(workspaceRoot, host, devServerTargetSpec, overrides)
       .subscribe(undefined, () => done(), done.fail);
   }, 30000);
 });

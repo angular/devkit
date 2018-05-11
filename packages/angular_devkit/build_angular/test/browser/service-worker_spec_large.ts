@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
+import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
 
 
 describe('Browser Builder', () => {
@@ -44,7 +45,7 @@ describe('Browser Builder', () => {
   it('errors if no ngsw-config.json is present', (done) => {
     const overrides = { serviceWorker: true };
 
-    runTargetSpec(host, browserTargetSpec, overrides)
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides)
       .subscribe(event => {
         expect(event.success).toBe(false);
       }, () => done(), done.fail);
@@ -57,7 +58,7 @@ describe('Browser Builder', () => {
     });
 
     const overrides = { serviceWorker: true };
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
       tap(buildEvent => {
         expect(buildEvent.success).toBe(true);
         expect(host.scopedSync().exists(normalize('dist/ngsw.json')));
@@ -112,7 +113,7 @@ describe('Browser Builder', () => {
     });
 
     const overrides = { serviceWorker: true, baseHref: '/foo/bar' };
-    runTargetSpec(host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
       tap(buildEvent => {
         expect(buildEvent.success).toBe(true);
         expect(host.scopedSync().exists(normalize('dist/ngsw.json')));

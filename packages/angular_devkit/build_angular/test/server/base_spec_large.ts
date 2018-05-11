@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, host, runTargetSpec } from '../utils';
+import { Timeout, host, workspaceRoot } from '../utils';
 
 
 describe('Server Builder', () => {
@@ -20,7 +21,7 @@ describe('Server Builder', () => {
   it('works (base)', (done) => {
     const overrides = { };
 
-    runTargetSpec(host, { project: 'app', target: 'server' }, overrides).pipe(
+    runTargetSpec(workspaceRoot, host, { project: 'app', target: 'server' }, overrides).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(true);
 
