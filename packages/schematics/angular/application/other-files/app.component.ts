@@ -31,5 +31,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.<%= styleext %>']<% } %>
 })
 export class AppComponent {
-  title = '<%= prefix %>';
+  title = '<%= name %>';
 }
