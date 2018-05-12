@@ -22,9 +22,9 @@ export class UpdateRecorderBase implements UpdateRecorder {
   }
 
   static createFromFileEntry(entry: FileEntry): UpdateRecorderBase {
-    const c0 = entry.content.readUInt8(0, true);
-    const c1 = entry.content.readUInt8(1, true);
-    const c2 = entry.content.readUInt8(2, true);
+    const c0 = entry.content.byteLength > 0 && entry.content.readUInt8(0);
+    const c1 = entry.content.byteLength > 1 && entry.content.readUInt8(1);
+    const c2 = entry.content.byteLength > 2 && entry.content.readUInt8(2);
 
     // Check if we're BOM.
     if (c0 == 0xEF && c1 == 0xBB && c2 == 0xBF) {
