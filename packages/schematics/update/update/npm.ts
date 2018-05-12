@@ -7,6 +7,7 @@
  */
 import { logging } from '@angular-devkit/core';
 import { exec } from 'child_process';
+import { readFileSync } from 'fs';
 import { Observable, ReplaySubject, concat, of } from 'rxjs';
 import { concatMap, filter, first, map, toArray } from 'rxjs/operators';
 import * as url from 'url';
@@ -39,6 +40,22 @@ function getNpmConfigOption(option: string) {
       obs.complete();
     }
   });
+}
+
+function getNpmClientSslOptions(strictSsl?: string, cafile?: string) {
+  const sslOptions: { strict?: boolean, ca?: Buffer } = {};
+
+  if (strictSsl === 'false') {
+    sslOptions.strict = false;
+  } else if (strictSsl === 'true') {
+    sslOptions.strict = true;
+  }
+
+  if (cafile) {
+    sslOptions.ca = readFileSync(cafile);
+  }
+
+  return sslOptions;
 }
 
 /**
@@ -92,23 +109,20 @@ export function getNpmPackageJson(
         getNpmConfigOption('proxy'),
         getNpmConfigOption('https-proxy'),
         getNpmConfigOption('strict-ssl'),
+        getNpmConfigOption('cafile'),
       ).pipe(
         toArray(),
         concatMap(options => {
           const subject = new ReplaySubject<NpmRepositoryPackageJson>(1);
+
+          const sslOptions = getNpmClientSslOptions(options[2], options[3]);
 
           const client = new RegistryClient({
             proxy: {
               http: options[0],
               https: options[1],
             },
-            ssl: {
-              ...(options[2] === 'false'
-                ? { strict: false }
-                : (options[2] === 'true'
-                   ? { strict: true }
-                   : {})),
-            },
+            ssl: sslOptions,
           });
           client.log.level = 'silent';
           const params = {
