@@ -10,7 +10,7 @@ import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { BrowserBuilderSchema } from '../../src';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 export const lazyModuleFiles: { [path: string]: string } = {
@@ -81,7 +81,7 @@ describe('Browser Builder lazy modules', () => {
     host.writeMultipleFiles(lazyModuleFiles);
     host.writeMultipleFiles(lazyModuleImport);
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.scopedSync().exists(join(outputPath, 'lazy-lazy-module.js'))).toBe(true);
@@ -93,7 +93,7 @@ describe('Browser Builder lazy modules', () => {
     host.writeMultipleFiles(lazyModuleFiles);
     host.writeMultipleFiles(lazyModuleImport);
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, { aot: true }).pipe(
+    runTargetSpec(host, browserTargetSpec, { aot: true }).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.scopedSync()
@@ -110,7 +110,7 @@ describe('Browser Builder lazy modules', () => {
     // Using `import()` in TS require targetting `esnext` modules.
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).toPromise().then(done, done.fail);
@@ -126,7 +126,7 @@ describe('Browser Builder lazy modules', () => {
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, 'lazy-module.js'))).toBe(true)),
     ).toPromise().then(done, done.fail);
@@ -138,7 +138,7 @@ describe('Browser Builder lazy modules', () => {
       'src/main.ts': `declare var System: any; System.import('./lazy-module');`,
     });
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).toPromise().then(done, done.fail);
@@ -153,7 +153,7 @@ describe('Browser Builder lazy modules', () => {
 
     const overrides: Partial<BrowserBuilderSchema> = { namedChunks: false };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
     ).toPromise().then(done, done.fail);
@@ -167,7 +167,7 @@ describe('Browser Builder lazy modules', () => {
     });
     host.replaceInFile('src/tsconfig.app.json', `"module": "es2015"`, `"module": "esnext"`);
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, '1.js'))).toBe(true)),
@@ -186,7 +186,7 @@ describe('Browser Builder lazy modules', () => {
 
     const overrides: Partial<BrowserBuilderSchema> = { commonChunk: false };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, '0.js'))).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, '1.js'))).toBe(true)),
@@ -218,7 +218,7 @@ describe('Browser Builder lazy modules', () => {
 
     const overrides: Partial<BrowserBuilderSchema> = { lazyModules: ['src/app/lazy/lazy.module'] };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync().exists(join(outputPath, 'src-app-lazy-lazy-module.js')))
         .toBe(true)),
@@ -253,7 +253,7 @@ describe('Browser Builder lazy modules', () => {
       optimization: true,
     };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(host.scopedSync()
         .exists(join(outputPath, 'src-app-lazy-lazy-module-ngfactory.js')))

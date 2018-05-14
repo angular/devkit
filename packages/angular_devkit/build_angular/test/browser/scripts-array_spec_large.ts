@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { PathFragment, join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder scripts array', () => {
@@ -67,7 +67,7 @@ describe('Browser Builder scripts array', () => {
       scripts: getScriptsOption(),
     };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => Object.keys(matches).forEach(fileName => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
@@ -86,7 +86,7 @@ describe('Browser Builder scripts array', () => {
       scripts: getScriptsOption(),
     };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const scriptsBundle = host.fileMatchExists(outputPath, /scripts\.[0-9a-f]{20}\.js/);
@@ -115,7 +115,7 @@ describe('Browser Builder scripts array', () => {
 
     const overrides = { scripts: getScriptsOption() };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const re = new RegExp(

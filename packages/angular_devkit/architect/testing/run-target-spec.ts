@@ -14,7 +14,6 @@ import { TestProjectHost } from './test-project-host';
 
 
 export function runTargetSpec(
-  workspaceRoot: Path,
   host: TestProjectHost,
   targetSpec: TargetSpecifier,
   overrides = {},
@@ -22,7 +21,7 @@ export function runTargetSpec(
 ): Observable<BuildEvent> {
   targetSpec = { ...targetSpec, overrides };
   const workspaceFile = normalize('angular.json');
-  const workspace = new experimental.workspace.Workspace(workspaceRoot, host);
+  const workspace = new experimental.workspace.Workspace(host.root(), host);
 
   return workspace.loadWorkspaceFromHost(workspaceFile).pipe(
     concatMap(ws => new Architect(ws).loadArchitect()),

@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap, toArray } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder assets', () => {
@@ -45,7 +45,7 @@ describe('Browser Builder assets', () => {
       ],
     };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         // Assets we expect should be there.
@@ -70,7 +70,7 @@ describe('Browser Builder assets', () => {
       }],
     };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides)
+    runTargetSpec(host, browserTargetSpec, overrides)
       .subscribe(undefined, () => done(), done.fail);
 
     // The node_modules folder must be deleted, otherwise code that tries to find the
@@ -87,7 +87,7 @@ describe('Browser Builder assets', () => {
       assets: ['not-source-root/file.txt'],
     };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides)
+    runTargetSpec(host, browserTargetSpec, overrides)
       .subscribe(undefined, () => done(), done.fail);
 
     // The node_modules folder must be deleted, otherwise code that tries to find the
@@ -100,7 +100,7 @@ describe('Browser Builder assets', () => {
       assets: [],
     };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       toArray(),
       tap((buildEvents) => expect(buildEvents.length).toBe(1)),
     ).toPromise().then(done, done.fail);

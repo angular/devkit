@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder stats json', () => {
@@ -21,7 +21,7 @@ describe('Browser Builder stats json', () => {
   it('works', (done) => {
     const overrides = { statsJson: true };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'stats.json');

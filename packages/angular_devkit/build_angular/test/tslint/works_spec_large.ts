@@ -10,7 +10,7 @@ import { TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
 import { TslintBuilderOptions } from '../../src';
-import { host, tslintTargetSpec, workspaceRoot } from '../utils';
+import { host, tslintTargetSpec } from '../utils';
 
 
 describe('Tslint Target', () => {
@@ -20,7 +20,7 @@ describe('Tslint Target', () => {
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec).pipe(
+    runTargetSpec(host, tslintTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, 30000);
@@ -29,7 +29,7 @@ describe('Tslint Target', () => {
     host.writeMultipleFiles(filesWithErrors);
     const overrides: Partial<TslintBuilderOptions> = { exclude: ['**/foo.ts'] };
 
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, 30000);
@@ -38,7 +38,7 @@ describe('Tslint Target', () => {
     host.writeMultipleFiles(filesWithErrors);
     const overrides: Partial<TslintBuilderOptions> = { fix: true };
 
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = normalize('src/foo.ts');
@@ -53,7 +53,7 @@ describe('Tslint Target', () => {
     const logger = new TestLogger('lint-force');
     const overrides: Partial<TslintBuilderOptions> = { force: true };
 
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec, overrides, logger).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(logger.includes(`" should be '`)).toBe(true);
@@ -67,7 +67,7 @@ describe('Tslint Target', () => {
     const logger = new TestLogger('lint-format');
     const overrides: Partial<TslintBuilderOptions> = { format: 'stylish' };
 
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec, overrides, logger).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
       tap(() => {
         expect(logger.includes(`quotemark`)).toBe(true);
@@ -91,7 +91,7 @@ describe('Tslint Target', () => {
     });
     const overrides: Partial<TslintBuilderOptions> = { tslintConfig: undefined };
 
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
     ).toPromise().then(done, done.fail);
   }, 30000);
@@ -112,7 +112,7 @@ describe('Tslint Target', () => {
     });
     const overrides: Partial<TslintBuilderOptions> = { tslintConfig: 'tslint.json' };
 
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, 30000);
@@ -123,7 +123,7 @@ describe('Tslint Target', () => {
       files: ['src/app/**/*.ts'],
     };
 
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, 30000);
@@ -133,7 +133,7 @@ describe('Tslint Target', () => {
       tsConfig: 'src/tsconfig.app.json',
     };
 
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, 30000);
@@ -143,7 +143,7 @@ describe('Tslint Target', () => {
       tsConfig: ['src/tsconfig.app.json'],
     };
 
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, 30000);
@@ -153,7 +153,7 @@ describe('Tslint Target', () => {
       tsConfig: ['src/tsconfig.app.json', 'src/tsconfig.spec.json'],
     };
 
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec, overrides).pipe(
+    runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, 30000);
@@ -164,7 +164,7 @@ describe('Tslint Target', () => {
       typeCheck: true,
     };
 
-    runTargetSpec(workspaceRoot, host, tslintTargetSpec, overrides)
+    runTargetSpec(host, tslintTargetSpec, overrides)
       .subscribe(undefined, () => done(), done.fail);
   }, 30000);
 });

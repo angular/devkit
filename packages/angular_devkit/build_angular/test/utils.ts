@@ -11,8 +11,7 @@ import { join, normalize } from '@angular-devkit/core';
 
 
 const devkitRoot = normalize((global as any)._DevKitRoot); // tslint:disable-line:no-any
-export const workspaceRoot = join(devkitRoot,
-  'tests/@angular_devkit/build_angular/hello-world-app/');
+const workspaceRoot = join(devkitRoot, 'tests/@angular_devkit/build_angular/hello-world-app/');
 export const host = new TestProjectHost(workspaceRoot);
 export const outputPath = normalize('dist');
 

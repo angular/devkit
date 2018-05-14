@@ -8,7 +8,7 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder tsconfig paths', () => {
@@ -26,7 +26,7 @@ describe('Browser Builder tsconfig paths', () => {
       },
     `);
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
@@ -68,7 +68,7 @@ describe('Browser Builder tsconfig paths', () => {
       console.log(meaning5)
     `);
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);

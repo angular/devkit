@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder source map', () => {
@@ -21,7 +21,7 @@ describe('Browser Builder source map', () => {
   it('works', (done) => {
     const overrides = { sourceMap: true };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js.map');
@@ -33,7 +33,7 @@ describe('Browser Builder source map', () => {
   it('does not output source map when disabled', (done) => {
     const overrides = { sourceMap: false };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js.map');
@@ -45,7 +45,7 @@ describe('Browser Builder source map', () => {
   it('supports eval source map', (done) => {
     const overrides = { sourceMap: true, evalSourceMap: true };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBe(false);

@@ -8,7 +8,7 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder allow js', () => {
@@ -24,7 +24,7 @@ describe('Browser Builder allow js', () => {
     // TODO: this test originally edited tsconfig to have `"allowJs": true` but works without it.
     // Investigate.
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
@@ -37,7 +37,7 @@ describe('Browser Builder allow js', () => {
 
     const overrides = { aot: true };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);

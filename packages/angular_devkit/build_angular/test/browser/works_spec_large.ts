@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder basic test', () => {
@@ -19,7 +19,7 @@ describe('Browser Builder basic test', () => {
   afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
-    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         // Default files should be in outputPath.

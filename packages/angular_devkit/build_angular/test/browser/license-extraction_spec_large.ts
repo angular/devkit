@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder license extraction', () => {
@@ -24,7 +24,7 @@ describe('Browser Builder license extraction', () => {
     // TODO: make license extraction independent from optimization level.
     const overrides = { extractLicenses: true, optimization: true };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, '3rdpartylicenses.txt');

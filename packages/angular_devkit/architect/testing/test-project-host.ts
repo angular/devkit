@@ -8,92 +8,96 @@
 
 import {
   Path,
-  getSystemPath,
+  basename,
+  dirname,
+  join,
   normalize,
+  relative,
   virtualFs,
 } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { SpawnOptions, spawn } from 'child_process';
 import { Stats } from 'fs';
-import { EMPTY, Observable } from 'rxjs';
-import { concatMap, map } from 'rxjs/operators';
+import { EMPTY, Observable, from, of } from 'rxjs';
+import { concatMap, delay, map, mergeMap, retry, tap } from 'rxjs/operators';
 
-
-interface ProcessOutput {
-  stdout: string;
-  stderr: string;
-}
 
 export class TestProjectHost extends NodeJsSyncHost {
-  private _scopedSyncHost: virtualFs.SyncDelegateHost<Stats>;
+  private _currentRoot: Path | null = null;
+  private _scopedSyncHost: virtualFs.SyncDelegateHost<Stats> | null = null;
 
-  constructor(protected _root: Path) {
+  constructor(protected _templateRoot: Path) {
     super();
-    this._scopedSyncHost = new virtualFs.SyncDelegateHost(new virtualFs.ScopedHost(this, _root));
   }
 
-  scopedSync() {
-    return this._scopedSyncHost;
+  root(): Path {
+    if (this._currentRoot === null) {
+      throw new Error('TestProjectHost must be initialized before being used.');
+    }
+
+    // tslint:disable-next-line:non-null-operator
+    return this._currentRoot!;
+  }
+
+  scopedSync(): virtualFs.SyncDelegateHost<Stats> {
+    if (this._currentRoot === null || this._scopedSyncHost === null) {
+      throw new Error('TestProjectHost must be initialized before being used.');
+    }
+
+    // tslint:disable-next-line:non-null-operator
+    return this._scopedSyncHost!;
   }
 
   initialize(): Observable<void> {
-    return this.exists(normalize('.git')).pipe(
-      concatMap(exists => !exists ? this._gitInit() : EMPTY),
+    const recursiveList = (path: Path): Observable<Path> => this.list(path).pipe(
+      // Emit each fragment individually.
+      concatMap(fragments => from(fragments)),
+      // Join the path with fragment.
+      map(fragment => join(path, fragment)),
+      // Emit directory content paths instead of the directory path.
+      mergeMap(path => this.isDirectory(path).pipe(
+        concatMap(isDir => isDir ? recursiveList(path) : of(path)),
+      )),
+    );
+
+    // Find a unique folder that we can write to to use as current root.
+    return this.findUniqueFolderPath().pipe(
+      // Save the path and create a scoped host for it.
+      tap(newFolderPath => {
+        this._currentRoot = newFolderPath;
+        this._scopedSyncHost = new virtualFs.SyncDelegateHost(
+          new virtualFs.ScopedHost(this, this.root()));
+      }),
+      // List all files in root.
+      concatMap(() => recursiveList(this._templateRoot)),
+      // Copy them over to the current root.
+      concatMap(from => {
+        const to = join(this.root(), relative(this._templateRoot, from));
+
+        return this.read(from).pipe(
+          concatMap(buffer => this.write(to, buffer)),
+        );
+      }),
+      map(() => { }),
     );
   }
 
   restore(): Observable<void> {
-    return this._gitClean();
-  }
+    if (this._currentRoot === null) {
+      return EMPTY;
+    }
 
-  private _gitClean(): Observable<void> {
-    return this._exec('git', ['clean', '-fd']).pipe(
-      concatMap(() => this._exec('git', ['checkout', '.'])),
+    // Delete the current root and clear the variables.
+    // Wait 50ms and retry up to 10 times, to give time for file locks to clear.
+    return this.exists(this.root()).pipe(
+      delay(50),
+      concatMap(exists => exists ? this.delete(this.root()) : of(null)),
+      retry(10),
+      tap(() => {
+        this._currentRoot = null;
+        this._scopedSyncHost = null;
+      }),
       map(() => { }),
     );
-  }
-
-  private _gitInit(): Observable<void> {
-    return this._exec('git', ['init']).pipe(
-      concatMap(() => this._exec('git', ['config', 'user.email', 'angular-core+e2e@google.com'])),
-      concatMap(() => this._exec('git', ['config', 'user.name', 'Angular DevKit Tests'])),
-      concatMap(() => this._exec('git', ['add', '--all'])),
-      concatMap(() => this._exec('git', ['commit', '-am', '"Initial commit"'])),
-      map(() => { }),
-    );
-  }
-
-  private _exec(cmd: string, args: string[]): Observable<ProcessOutput> {
-    return new Observable(obs => {
-      args = args.filter(x => x !== undefined);
-      let stdout = '';
-      let stderr = '';
-
-      const spawnOptions: SpawnOptions = { cwd: getSystemPath(this._root) };
-
-      if (process.platform.startsWith('win')) {
-        args.unshift('/c', cmd);
-        cmd = 'cmd.exe';
-        spawnOptions['stdio'] = 'pipe';
-      }
-
-      const childProcess = spawn(cmd, args, spawnOptions);
-      childProcess.stdout.on('data', (data: Buffer) => stdout += data.toString('utf-8'));
-      childProcess.stderr.on('data', (data: Buffer) => stderr += data.toString('utf-8'));
-
-      // Create the error here so the stack shows who called this function.
-      const err = new Error(`Running "${cmd} ${args.join(' ')}" returned error code `);
-
-      childProcess.on('exit', (code) => {
-        if (!code) {
-          obs.next({ stdout, stderr });
-        } else {
-          err.message += `${code}.\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n`;
-          obs.error(err);
-        }
-        obs.complete();
-      });
-    });
   }
 
   writeMultipleFiles(files: { [path: string]: string | ArrayBufferLike | Buffer }): void {
@@ -136,5 +140,16 @@ export class TestProjectHost extends NodeJsSyncHost {
   copyFile(from: string, to: string) {
     const content = this.scopedSync().read(normalize(from));
     this.scopedSync().write(normalize(to), content);
+  }
+
+  private findUniqueFolderPath(): Observable<Path> {
+    // 11 character alphanumeric string.
+    const randomString = Math.random().toString(36).slice(2);
+    const newFolderName = `test-project-host-${basename(this._templateRoot)}-${randomString}`;
+    const newFolderPath = join(dirname(this._templateRoot), newFolderName);
+
+    return this.exists(newFolderPath).pipe(
+      concatMap(exists => exists ? this.findUniqueFolderPath() : of(newFolderPath)),
+    );
   }
 }

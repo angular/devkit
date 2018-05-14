@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, tags, virtualFs } from '@angular-devkit/core';
 import { concatMap, tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder styles', () => {
@@ -67,7 +67,7 @@ describe('Browser Builder styles', () => {
 
     const overrides = { extractCss: true, styles: getStylesOption() };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       // Check css files were created.
       tap(() => Object.keys(cssMatches).forEach(fileName => {
@@ -84,7 +84,7 @@ describe('Browser Builder styles', () => {
         expect(content).toMatch(cssIndexMatches[fileName]);
       })),
       // Also test with extractCss false.
-      concatMap(() => runTargetSpec(workspaceRoot, host, browserTargetSpec,
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
         { extractCss: false, styles: getStylesOption() })),
       // TODO: figure out why adding this tap breaks typings.
       // This also happens in the output-hashing spec.
@@ -124,7 +124,7 @@ describe('Browser Builder styles', () => {
 
     const overrides = { extractCss: true };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
@@ -173,7 +173,7 @@ describe('Browser Builder styles', () => {
       host.replaceInFile('src/app/app.component.ts', './app.component.css',
         `./app.component.${ext}`);
 
-      runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+      runTargetSpec(host, browserTargetSpec, overrides).pipe(
         tap((buildEvent) => expect(buildEvent.success).toBe(true)),
         tap(() => Object.keys(matches).forEach(fileName => {
           const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
@@ -203,7 +203,7 @@ describe('Browser Builder styles', () => {
         styles: [{ input: `src/styles.${ext}` }],
       };
 
-      runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+      runTargetSpec(host, browserTargetSpec, overrides).pipe(
         tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       ).toPromise().then(done, done.fail);
     }, Timeout.Basic);
@@ -218,7 +218,7 @@ describe('Browser Builder styles', () => {
       ],
     };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
@@ -267,7 +267,7 @@ describe('Browser Builder styles', () => {
         },
       };
 
-      runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+      runTargetSpec(host, browserTargetSpec, overrides).pipe(
         tap((buildEvent) => expect(buildEvent.success).toBe(true)),
         tap(() => Object.keys(matches).forEach(fileName => {
           const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
@@ -300,7 +300,7 @@ describe('Browser Builder styles', () => {
       styles: [`src/styles.scss`],
     };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = 'dist/styles.css';
@@ -343,7 +343,7 @@ describe('Browser Builder styles', () => {
 
     const overrides = { extractCss: true, styles: [`src/styles.scss`] };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, 30000);
@@ -358,7 +358,7 @@ describe('Browser Builder styles', () => {
 
     const overrides = { extractCss: true, optimization: false };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = 'dist/styles.css';
@@ -381,7 +381,7 @@ describe('Browser Builder styles', () => {
 
     const overrides = { extractCss: true, optimization: true };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = 'dist/styles.css';
@@ -416,7 +416,7 @@ describe('Browser Builder styles', () => {
     const mainBundle = 'dist/main.js';
 
     // Check base paths are correctly generated.
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, { aot: true, extractCss: true }).pipe(
+    runTargetSpec(host, browserTargetSpec, { aot: true, extractCss: true }).pipe(
       tap(() => {
         const styles = virtualFs.fileBufferToString(
           host.scopedSync().read(normalize(stylesBundle)),
@@ -436,7 +436,7 @@ describe('Browser Builder styles', () => {
           .toBe(true);
       }),
       // Check urls with deploy-url scheme are used as is.
-      concatMap(() => runTargetSpec(workspaceRoot, host, browserTargetSpec,
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
         { extractCss: true, baseHref: '/base/', deployUrl: 'http://deploy.url/' },
       )),
       tap(() => {
@@ -450,7 +450,7 @@ describe('Browser Builder styles', () => {
           .toContain(`url('http://deploy.url/assets/component-img-absolute.svg')`);
       }),
       // Check urls with base-href scheme are used as is (with deploy-url).
-      concatMap(() => runTargetSpec(workspaceRoot, host, browserTargetSpec,
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
         { extractCss: true, baseHref: 'http://base.url/', deployUrl: 'deploy/' },
       )),
       tap(() => {
@@ -464,7 +464,7 @@ describe('Browser Builder styles', () => {
           .toContain(`url('http://base.url/deploy/assets/component-img-absolute.svg')`);
       }),
       // Check urls with deploy-url and base-href scheme only use deploy-url.
-      concatMap(() => runTargetSpec(workspaceRoot, host, browserTargetSpec, {
+      concatMap(() => runTargetSpec(host, browserTargetSpec, {
         extractCss: true,
         baseHref: 'http://base.url/',
         deployUrl: 'http://deploy.url/',
@@ -479,7 +479,7 @@ describe('Browser Builder styles', () => {
         expect(main).toContain(`url('http://deploy.url/assets/component-img-absolute.svg')`);
       }),
       // Check with schemeless base-href and deploy-url flags.
-      concatMap(() => runTargetSpec(workspaceRoot, host, browserTargetSpec,
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
         { extractCss: true, baseHref: '/base/', deployUrl: 'deploy/' },
       )),
       tap(() => {
@@ -491,7 +491,7 @@ describe('Browser Builder styles', () => {
         expect(main).toContain(`url('/base/deploy/assets/component-img-absolute.svg')`);
       }),
       // Check with identical base-href and deploy-url flags.
-      concatMap(() => runTargetSpec(workspaceRoot, host, browserTargetSpec,
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
         { extractCss: true, baseHref: '/base/', deployUrl: '/base/' },
       )),
       tap(() => {
@@ -503,7 +503,7 @@ describe('Browser Builder styles', () => {
         expect(main).toContain(`url('/base/assets/component-img-absolute.svg')`);
       }),
       // Check with only base-href flag.
-      concatMap(() => runTargetSpec(workspaceRoot, host, browserTargetSpec,
+      concatMap(() => runTargetSpec(host, browserTargetSpec,
         { extractCss: true, baseHref: '/base/' },
       )),
       tap(() => {
@@ -524,7 +524,7 @@ describe('Browser Builder styles', () => {
       scripts: ['../../../../node_modules/bootstrap/dist/js/bootstrap.js'],
     };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);

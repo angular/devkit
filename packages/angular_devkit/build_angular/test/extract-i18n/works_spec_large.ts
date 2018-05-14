@@ -9,7 +9,7 @@
 import { TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { extractI18nTargetSpec, host, workspaceRoot } from '../utils';
+import { extractI18nTargetSpec, host } from '../utils';
 
 
 describe('Extract i18n Target', () => {
@@ -21,7 +21,7 @@ describe('Extract i18n Target', () => {
   it('works', (done) => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
 
-    runTargetSpec(workspaceRoot, host, extractI18nTargetSpec).pipe(
+    runTargetSpec(host, extractI18nTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.scopedSync().exists((extractionFile))).toBe(true);
@@ -36,7 +36,7 @@ describe('Extract i18n Target', () => {
     host.appendToFile('src/app/app.component.html',
       '<p i18n>Hello world <span i18n>inner</span></p>');
 
-    runTargetSpec(workspaceRoot, host, extractI18nTargetSpec, {}, logger).pipe(
+    runTargetSpec(host, extractI18nTargetSpec, {}, logger).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         const msg = 'Could not mark an element as translatable inside a translatable section';
@@ -49,7 +49,7 @@ describe('Extract i18n Target', () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
     const overrides = { i18nLocale: 'fr' };
 
-    runTargetSpec(workspaceRoot, host, extractI18nTargetSpec, overrides).pipe(
+    runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.scopedSync().exists((extractionFile))).toBe(true);
@@ -65,7 +65,7 @@ describe('Extract i18n Target', () => {
     const extractionFile = join(normalize('src'), outFile);
     const overrides = { outFile };
 
-    runTargetSpec(workspaceRoot, host, extractI18nTargetSpec, overrides).pipe(
+    runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.scopedSync().exists(extractionFile)).toBe(true);
@@ -82,7 +82,7 @@ describe('Extract i18n Target', () => {
     const extractionFile = join(normalize('src'), outputPath, 'messages.xlf');
     const overrides = { outputPath };
 
-    runTargetSpec(workspaceRoot, host, extractI18nTargetSpec, overrides).pipe(
+    runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.scopedSync().exists(extractionFile)).toBe(true);
@@ -97,7 +97,7 @@ describe('Extract i18n Target', () => {
     const extractionFile = join(normalize('src'), 'messages.xmb');
     const overrides = { i18nFormat: 'xmb' };
 
-    runTargetSpec(workspaceRoot, host, extractI18nTargetSpec, overrides).pipe(
+    runTargetSpec(host, extractI18nTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         expect(host.scopedSync().exists(extractionFile)).toBe(true);

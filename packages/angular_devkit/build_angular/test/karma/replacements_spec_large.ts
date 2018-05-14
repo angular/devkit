@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { host, karmaTargetSpec, workspaceRoot } from '../utils';
+import { host, karmaTargetSpec } from '../utils';
 
 
 describe('Karma Builder file replacements', () => {
@@ -39,7 +39,7 @@ describe('Karma Builder file replacements', () => {
       }],
     };
 
-    runTargetSpec(workspaceRoot, host, karmaTargetSpec, overrides).pipe(
+    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, 30000);

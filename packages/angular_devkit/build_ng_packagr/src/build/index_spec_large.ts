@@ -22,10 +22,13 @@ export enum Timeout {
 }
 
 describe('NgPackagr Builder', () => {
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
+
   it('works', (done) => {
     const targetSpec: TargetSpecifier = { project: 'lib', target: 'build' };
 
-    runTargetSpec(workspaceRoot, host, targetSpec).pipe(
+    runTargetSpec(host, targetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
@@ -33,7 +36,7 @@ describe('NgPackagr Builder', () => {
   it('tests works', (done) => {
     const targetSpec: TargetSpecifier = { project: 'lib', target: 'test' };
 
-    runTargetSpec(workspaceRoot, host, targetSpec).pipe(
+    runTargetSpec(host, targetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Standard);
@@ -41,7 +44,7 @@ describe('NgPackagr Builder', () => {
   it('lint works', (done) => {
     const targetSpec: TargetSpecifier = { project: 'lib', target: 'lint' };
 
-    runTargetSpec(workspaceRoot, host, targetSpec).pipe(
+    runTargetSpec(host, targetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);

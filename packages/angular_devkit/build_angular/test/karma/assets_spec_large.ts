@@ -8,7 +8,7 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { host, karmaTargetSpec, workspaceRoot } from '../utils';
+import { host, karmaTargetSpec } from '../utils';
 
 
 describe('Karma Builder assets', () => {
@@ -100,7 +100,7 @@ describe('Karma Builder assets', () => {
       ],
     };
 
-    runTargetSpec(workspaceRoot, host, karmaTargetSpec, overrides).pipe(
+    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       tap(buildEvent => expect(buildEvent.success).toBe(true)),
     ).toPromise().then(done, done.fail);
   }, 45000);

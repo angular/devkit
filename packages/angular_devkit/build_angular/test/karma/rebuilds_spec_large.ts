@@ -8,7 +8,7 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { host, karmaTargetSpec, workspaceRoot } from '../utils';
+import { host, karmaTargetSpec } from '../utils';
 
 
 // Karma watch mode is currently bugged:
@@ -21,7 +21,7 @@ xdescribe('Karma Builder watch mode', () => {
 
   it('works', (done) => {
     const overrides = { watch: true };
-    runTargetSpec(workspaceRoot, host, karmaTargetSpec, overrides).pipe(
+    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       debounceTime(500),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       take(1),
@@ -32,7 +32,7 @@ xdescribe('Karma Builder watch mode', () => {
     const overrides = { watch: true };
     let buildNumber = 0;
 
-    runTargetSpec(workspaceRoot, host, karmaTargetSpec, overrides).pipe(
+    runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       debounceTime(500),
       tap((buildEvent) => {
         buildNumber += 1;

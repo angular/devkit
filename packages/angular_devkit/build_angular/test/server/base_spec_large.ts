@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, host, workspaceRoot } from '../utils';
+import { Timeout, host } from '../utils';
 
 
 describe('Server Builder', () => {
@@ -21,7 +21,7 @@ describe('Server Builder', () => {
   it('works (base)', (done) => {
     const overrides = { };
 
-    runTargetSpec(workspaceRoot, host, { project: 'app', target: 'server' }, overrides).pipe(
+    runTargetSpec(host, { project: 'app', target: 'server' }, overrides).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(true);
 

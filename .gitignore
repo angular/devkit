@@ -1,5 +1,6 @@
 # Outputs
 bazel-*
+test-project-host-*
 dist/
 
 # IDEs

@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder', () => {
@@ -45,7 +45,7 @@ describe('Browser Builder', () => {
   it('errors if no ngsw-config.json is present', (done) => {
     const overrides = { serviceWorker: true };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides)
+    runTargetSpec(host, browserTargetSpec, overrides)
       .subscribe(event => {
         expect(event.success).toBe(false);
       }, () => done(), done.fail);
@@ -58,7 +58,7 @@ describe('Browser Builder', () => {
     });
 
     const overrides = { serviceWorker: true };
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap(buildEvent => {
         expect(buildEvent.success).toBe(true);
         expect(host.scopedSync().exists(normalize('dist/ngsw.json')));
@@ -113,7 +113,7 @@ describe('Browser Builder', () => {
     });
 
     const overrides = { serviceWorker: true, baseHref: '/foo/bar' };
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap(buildEvent => {
         expect(buildEvent.success).toBe(true);
         expect(host.scopedSync().exists(normalize('dist/ngsw.json')));

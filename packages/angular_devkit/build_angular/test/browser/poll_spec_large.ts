@@ -8,7 +8,7 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder poll', () => {
@@ -19,7 +19,7 @@ describe('Browser Builder poll', () => {
     const overrides = { watch: true, poll: 1000 };
     let msAvg = 1000;
     let lastTime: number;
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       // Debounce 1s, otherwise changes are too close together and polling doesn't work.
       debounceTime(1000),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),

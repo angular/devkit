@@ -9,7 +9,7 @@
 import { TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
@@ -66,7 +66,7 @@ describe('Browser Builder rebuilds', () => {
 
     let buildNumber = 0;
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       // We must debounce on watch mode because file watchers are not very accurate.
       // Changes from just before a process runs can be picked up and cause rebuilds.
       // In this case, cleanup from the test right before this one causes a few rebuilds.
@@ -114,7 +114,7 @@ describe('Browser Builder rebuilds', () => {
   it('rebuilds on CSS changes', (done) => {
     const overrides = { watch: true };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       debounceTime(500),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => host.appendToFile('src/app/app.component.css', ':host { color: blue; }')),
@@ -137,7 +137,7 @@ describe('Browser Builder rebuilds', () => {
     const typeError = `is not assignable to parameter of type 'number'`;
     let buildNumber = 0;
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides, logger).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
       debounceTime(1000),
       tap((buildEvent) => {
         buildNumber += 1;
@@ -187,7 +187,7 @@ describe('Browser Builder rebuilds', () => {
 
     const overrides = { watch: true };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       debounceTime(1000),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => host.writeMultipleFiles({ 'src/type.ts': `export type MyType = string;` })),
@@ -209,7 +209,7 @@ describe('Browser Builder rebuilds', () => {
     const syntaxError = 'Declaration or statement expected.';
     let buildNumber = 0;
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides, logger).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
       debounceTime(1000),
       tap((buildEvent) => {
         buildNumber += 1;
@@ -271,7 +271,7 @@ describe('Browser Builder rebuilds', () => {
     const overrides = { watch: true, aot: true, forkTypeChecker: false };
     let buildNumber = 0;
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       debounceTime(1000),
       tap((buildEvent) => {
         buildNumber += 1;

@@ -11,7 +11,7 @@ import { tags } from '@angular-devkit/core';
 import { from } from 'rxjs';
 import { concatMap, take, tap } from 'rxjs/operators';
 import { DevServerBuilderOptions } from '../../src';
-import { devServerTargetSpec, host, workspaceRoot } from '../utils';
+import { devServerTargetSpec, host } from '../utils';
 
 
 describe('Dev Server Builder ssl', () => {
@@ -21,7 +21,7 @@ describe('Dev Server Builder ssl', () => {
   it('works', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { ssl: true };
 
-    runTargetSpec(workspaceRoot, host, devServerTargetSpec, overrides).pipe(
+    runTargetSpec(host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => from(request('https://localhost:4200/index.html'))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
@@ -93,7 +93,7 @@ describe('Dev Server Builder ssl', () => {
       sslCert: '../ssl/server.crt',
     };
 
-    runTargetSpec(workspaceRoot, host, devServerTargetSpec, overrides).pipe(
+    runTargetSpec(host, devServerTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       concatMap(() => from(request('https://localhost:4200/index.html'))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),

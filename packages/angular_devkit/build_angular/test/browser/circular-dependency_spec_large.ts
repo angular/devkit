@@ -8,7 +8,7 @@
 
 import { TestLogger, runTargetSpec } from '@angular-devkit/architect/testing';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder circular dependency detection', () => {
@@ -22,7 +22,7 @@ describe('Browser Builder circular dependency detection', () => {
     const overrides = { baseHref: '/myUrl' };
     const logger = new TestLogger('circular-dependencies');
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides, logger).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('Circular dependency detected')).toBe(true)),
     ).toPromise().then(done, done.fail);

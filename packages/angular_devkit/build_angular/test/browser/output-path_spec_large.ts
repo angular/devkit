@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder output path', () => {
@@ -23,11 +23,11 @@ describe('Browser Builder output path', () => {
     host.scopedSync().write(join(outputPath, 'file.txt'), virtualFs.stringToFileBuffer('file'));
     // Delete an app file to force a failed compilation.
     // Failed compilations still delete files, but don't output any.
-    host.delete(join(workspaceRoot, 'src', 'app', 'app.component.ts')).subscribe({
+    host.delete(join(host.root(), 'src', 'app', 'app.component.ts')).subscribe({
       error: done.fail,
     });
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec).pipe(
+    runTargetSpec(host, browserTargetSpec).pipe(
       tap((buildEvent) => {
         expect(buildEvent.success).toBe(false);
         expect(host.scopedSync().exists(outputPath)).toBe(false);
@@ -38,7 +38,7 @@ describe('Browser Builder output path', () => {
   it('does not allow output path to be project root', (done) => {
     const overrides = { outputPath: './' };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides)
+    runTargetSpec(host, browserTargetSpec, overrides)
       .subscribe(undefined, () => done(), done.fail);
   }, Timeout.Basic);
 });

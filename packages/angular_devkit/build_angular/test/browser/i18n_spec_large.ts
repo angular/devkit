@@ -9,7 +9,7 @@
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { tap } from 'rxjs/operators';
-import { Timeout, browserTargetSpec, host, workspaceRoot } from '../utils';
+import { Timeout, browserTargetSpec, host } from '../utils';
 
 
 describe('Browser Builder i18n', () => {
@@ -54,7 +54,7 @@ describe('Browser Builder i18n', () => {
       i18nLocale: 'fr',
     };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
@@ -76,7 +76,7 @@ describe('Browser Builder i18n', () => {
     host.writeMultipleFiles({ 'src/locale/messages.fr.xlf': emptyTranslationFile });
     host.appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
@@ -98,7 +98,7 @@ describe('Browser Builder i18n', () => {
     host.writeMultipleFiles({ 'src/locale/messages.fr.xlf': emptyTranslationFile });
     host.appendToFile('src/app/app.component.html', '<p i18n>Other content</p>');
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
     ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
@@ -106,7 +106,7 @@ describe('Browser Builder i18n', () => {
   it('register locales', (done) => {
     const overrides = { aot: true, i18nLocale: 'fr_FR' };
 
-    runTargetSpec(workspaceRoot, host, browserTargetSpec, overrides).pipe(
+    runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => {
         const fileName = join(outputPath, 'main.js');
