@@ -220,7 +220,7 @@ describe('Browser Builder styles', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, Timeout.Basic);
+  }, Timeout.Complex);
 
   extensionsWithVariableSupport.forEach(ext => {
     it(`supports ${ext} includePaths`, (done) => {
