@@ -5,8 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable-next-line:no-any
-export type TemplateTag = (template: TemplateStringsArray, ...substitutions: any[]) => string;
+export interface TemplateTag<R = string> {
+  // Any is the only way here.
+  // tslint:disable-next-line:no-any
+  (template: TemplateStringsArray, ...substitutions: any[]): R;
+}
 
 
 // tslint:disable-next-line:no-any
