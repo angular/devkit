@@ -38,11 +38,13 @@ export interface SimpleMemoryHostStats {
 }
 
 export class SimpleMemoryHost implements Host<{}> {
-  private _cache = new Map<Path, Stats<SimpleMemoryHostStats>>();
+  protected readonly _cache = new Map<Path, Stats<SimpleMemoryHostStats>>();
   private _watchers = new Map<Path, [HostWatchOptions, Subject<HostWatchEvent>][]>();
 
   protected _newDirStats() {
     return {
+      inspect() { return '<Directory>'; },
+
       isFile() { return false; },
       isDirectory() { return true; },
       size: 0,
@@ -57,6 +59,8 @@ export class SimpleMemoryHost implements Host<{}> {
   }
   protected _newFileStats(content: FileBuffer, oldStats?: Stats<SimpleMemoryHostStats>) {
     return {
+      inspect() { return `<File size(${content.byteLength})>`; },
+
       isFile() { return true; },
       isDirectory() { return false; },
       size: content.byteLength,
@@ -158,7 +162,7 @@ export class SimpleMemoryHost implements Host<{}> {
     this._cache.set(path, stats);
     this._updateWatchers(path, old ? HostWatchEventType.Changed : HostWatchEventType.Created);
   }
-  _read(path: Path): FileBuffer {
+  protected _read(path: Path): FileBuffer {
     path = this._toAbsolute(path);
     const maybeStats = this._cache.get(path);
     if (!maybeStats) {
@@ -171,7 +175,7 @@ export class SimpleMemoryHost implements Host<{}> {
       return maybeStats.content;
     }
   }
-  _delete(path: Path): void {
+  protected _delete(path: Path): void {
     path = this._toAbsolute(path);
     if (this._isDirectory(path)) {
       for (const [cachePath, _] of this._cache.entries()) {
@@ -184,7 +188,7 @@ export class SimpleMemoryHost implements Host<{}> {
     }
     this._updateWatchers(path, HostWatchEventType.Deleted);
   }
-  _rename(from: Path, to: Path): void {
+  protected _rename(from: Path, to: Path): void {
     from = this._toAbsolute(from);
     to = this._toAbsolute(to);
     if (!this._cache.has(from)) {
@@ -214,7 +218,7 @@ export class SimpleMemoryHost implements Host<{}> {
     this._updateWatchers(from, HostWatchEventType.Renamed);
   }
 
-  _list(path: Path): PathFragment[] {
+  protected _list(path: Path): PathFragment[] {
     path = this._toAbsolute(path);
     if (this._isFile(path)) {
       throw new PathIsFileException(path);
@@ -239,21 +243,21 @@ export class SimpleMemoryHost implements Host<{}> {
     return [...result];
   }
 
-  _exists(path: Path): boolean {
+  protected _exists(path: Path): boolean {
     return !!this._cache.get(this._toAbsolute(path));
   }
-  _isDirectory(path: Path): boolean {
+  protected _isDirectory(path: Path): boolean {
     const maybeStats = this._cache.get(this._toAbsolute(path));
 
     return maybeStats ? maybeStats.isDirectory() : false;
   }
-  _isFile(path: Path): boolean {
+  protected _isFile(path: Path): boolean {
     const maybeStats = this._cache.get(this._toAbsolute(path));
 
     return maybeStats ? maybeStats.isFile() : false;
   }
 
-  _stat(path: Path): Stats<SimpleMemoryHostStats> {
+  protected _stat(path: Path): Stats<SimpleMemoryHostStats> {
     const maybeStats = this._cache.get(this._toAbsolute(path));
 
     if (!maybeStats) {
@@ -261,6 +265,21 @@ export class SimpleMemoryHost implements Host<{}> {
     } else {
       return maybeStats;
     }
+  }
+
+  protected _watch(path: Path, options?: HostWatchOptions): Observable<HostWatchEvent> {
+    path = this._toAbsolute(path);
+
+    const subject = new Subject<HostWatchEvent>();
+    let maybeWatcherArray = this._watchers.get(path);
+    if (!maybeWatcherArray) {
+      maybeWatcherArray = [];
+      this._watchers.set(path, maybeWatcherArray);
+    }
+
+    maybeWatcherArray.push([options || {}, subject]);
+
+    return subject.asObservable();
   }
 
   write(path: Path, content: FileBuffer): Observable<void> {
@@ -332,17 +351,6 @@ export class SimpleMemoryHost implements Host<{}> {
   }
 
   watch(path: Path, options?: HostWatchOptions): Observable<HostWatchEvent> | null {
-    path = this._toAbsolute(path);
-
-    const subject = new Subject<HostWatchEvent>();
-    let maybeWatcherArray = this._watchers.get(path);
-    if (!maybeWatcherArray) {
-      maybeWatcherArray = [];
-      this._watchers.set(path, maybeWatcherArray);
-    }
-
-    maybeWatcherArray.push([options || {}, subject]);
-
-    return subject.asObservable();
+    return this._watch(path, options);
   }
 }

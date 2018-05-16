@@ -13,6 +13,11 @@ export class BaseException extends Error {
 }
 
 
+export class UnknownException extends Error {
+  constructor(message: string) { super(message); }
+}
+
+
 // Exceptions
 export class FileDoesNotExistException extends BaseException {
   constructor(path: string) { super(`Path "${path}" does not exist.`); }
