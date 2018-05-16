@@ -46,6 +46,12 @@ export function stringToFileBuffer(str: string): FileBuffer {
   }
 }
 
+
+export const fileBuffer: TemplateTag<FileBuffer> = (strings, ...values) => {
+  return stringToFileBuffer(String.raw(strings, ...values));
+};
+
+
 export function fileBufferToString(fileBuffer: FileBuffer): string {
   if (fileBuffer.toString.length == 1) {
     return (fileBuffer.toString as (enc: string) => string)('utf-8');

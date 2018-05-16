@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException } from '../exception';
+import { TemplateTag } from '../utils/literals';
 
 
 export class InvalidPathException extends BaseException {
@@ -248,6 +249,11 @@ export function normalize(path: string): Path {
     return p.join(NormalizedSep) as Path;
   }
 }
+
+
+export const path: TemplateTag<Path> = (strings, ...values) => {
+  return normalize(String.raw(strings, ...values));
+};
 
 
 // Platform-specific paths.
