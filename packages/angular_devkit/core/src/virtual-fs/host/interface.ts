@@ -47,13 +47,10 @@ export interface HostCapabilities {
   synchronous: boolean;
 }
 
-export interface Host<StatsT extends object = {}> {
+export interface ReadonlyHost<StatsT extends object = {}> {
   readonly capabilities: HostCapabilities;
 
-  write(path: Path, content: FileBufferLike): Observable<void>;
   read(path: Path): Observable<FileBuffer>;
-  delete(path: Path): Observable<void>;
-  rename(from: Path, to: Path): Observable<void>;
 
   list(path: Path): Observable<PathFragment[]>;
 
@@ -61,8 +58,14 @@ export interface Host<StatsT extends object = {}> {
   isDirectory(path: Path): Observable<boolean>;
   isFile(path: Path): Observable<boolean>;
 
-  // Some hosts may not support stat.
+  // Some hosts may not support stats.
   stat(path: Path): Observable<Stats<StatsT>> | null;
+}
+
+export interface Host<StatsT extends object = {}> extends ReadonlyHost<StatsT> {
+  write(path: Path, content: FileBufferLike): Observable<void>;
+  delete(path: Path): Observable<void>;
+  rename(from: Path, to: Path): Observable<void>;
 
   // Some hosts may not support watching.
   watch(path: Path, options?: HostWatchOptions): Observable<HostWatchEvent> | null;
