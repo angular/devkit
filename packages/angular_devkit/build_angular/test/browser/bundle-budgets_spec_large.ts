@@ -38,7 +38,7 @@ describe('Browser Builder bundle budgets', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
     ).subscribe(undefined, done.fail, done);
-  }, Timeout.Standard);
+  }, Timeout.Complex);
 
   it('shows warnings', (done) => {
     const overrides = {
@@ -52,5 +52,5 @@ describe('Browser Builder bundle budgets', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('WARNING')).toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, Timeout.Standard);
+  }, Timeout.Complex);
 });

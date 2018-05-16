@@ -30,5 +30,5 @@ describe('Browser Builder license extraction', () => {
         expect(host.scopedSync().exists(fileName)).toBe(true);
       }),
     ).subscribe(undefined, done.fail, done);
-  }, Timeout.Standard);
+  }, Timeout.Complex);
 });

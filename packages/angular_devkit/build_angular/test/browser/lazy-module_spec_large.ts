@@ -258,5 +258,5 @@ describe('Browser Builder lazy modules', () => {
         .exists(join(outputPath, 'src-app-lazy-lazy-module-ngfactory.js')))
         .toBe(true)),
     ).subscribe(undefined, done.fail, done);
-  }, Timeout.Basic);
+  }, Timeout.Complex);
 });
