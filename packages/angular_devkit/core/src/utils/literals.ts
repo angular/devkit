@@ -55,3 +55,14 @@ export function stripIndents(strings: TemplateStringsArray, ...values: any[]) {
     .join('\n')
     .trim();
 }
+
+// tslint:disable-next-line:no-any
+export function trimNewlines(strings: TemplateStringsArray, ...values: any[]) {
+  const endResult = String.raw(strings, ...values);
+
+  return endResult
+    // Remove the newline at the start.
+    .replace(/^(?:\r?\n)+/, '')
+    // Remove the newline at the end and following whitespace.
+    .replace(/(?:\r?\n(?:\s*))$/, '');
+}

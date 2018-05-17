@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { oneLine, stripIndent, stripIndents } from './literals';
+import { oneLine, stripIndent, stripIndents, trimNewlines } from './literals';
 
 describe('literals', () => {
   describe('stripIndent', () => {
@@ -41,6 +41,16 @@ describe('literals', () => {
       `;
 
       expect(test).toBe('hello world how are you?  blue  red test');
+    });
+  });
+
+  describe('trimNewlines', () => {
+    it('works', () => {
+      const test = trimNewlines`
+        hello world
+      `;
+
+      expect(test).toBe('        hello world');
     });
   });
 });
