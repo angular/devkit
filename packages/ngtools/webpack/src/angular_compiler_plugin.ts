@@ -325,7 +325,7 @@ export class AngularCompilerPlugin {
 
   private _getChangedTsFiles() {
     return this._compilerHost.getChangedFilePaths()
-      .filter(k => k.endsWith('.ts') && !k.endsWith('.d.ts'))
+      .filter(k => (k.endsWith('.ts') || k.endsWith('.tsx')) && !k.endsWith('.d.ts'))
       .filter(k => this._compilerHost.fileExists(k));
   }
 
@@ -499,7 +499,7 @@ export class AngularCompilerPlugin {
           modulePath = lazyRouteTSFile;
           moduleKey = `${lazyRouteModule}${moduleName ? '#' + moduleName : ''}`;
         } else {
-          modulePath = lazyRouteTSFile.replace(/(\.d)?\.ts$/, '');
+          modulePath = lazyRouteTSFile.replace(/(\.d)?\.tsx?$/, '');
           modulePath += '.ngfactory.js';
           const factoryModuleName = moduleName ? `#${moduleName}NgFactory` : '';
           moduleKey = `${lazyRouteModule}.ngfactory${factoryModuleName}`;
@@ -686,7 +686,8 @@ export class AngularCompilerPlugin {
         // Wait for the plugin to be done when requesting `.ts` files directly (entry points), or
         // when the issuer is a `.ts` or `.ngfactory.js` file.
         nmf.hooks.beforeResolve.tapAsync('angular-compiler', (request: any, callback: any) => {
-          if (this.done && (request && request.request.endsWith('.ts')
+          if (this.done
+              && (request && (request.request.endsWith('.ts') || request.request.endsWith('.tsx'))
               || (request && request.context.issuer
                 && /\.ts|ngfactory\.js$/.test(request.context.issuer)))) {
             this.done.then(() => callback(null, request), () => callback(null, request));
@@ -893,7 +894,7 @@ export class AngularCompilerPlugin {
   }
 
   getCompiledFile(fileName: string) {
-    const outputFile = fileName.replace(/.ts$/, '.js');
+    const outputFile = fileName.replace(/.tsx?$/, '.js');
     let outputText: string;
     let sourceMap: string | undefined;
     let errorDependencies: string[] = [];
@@ -917,7 +918,8 @@ export class AngularCompilerPlugin {
       }
     } else {
       // Check if the TS input file and the JS output file exist.
-      if ((fileName.endsWith('.ts') && !this._compilerHost.fileExists(fileName, false))
+      if (((fileName.endsWith('.ts') || fileName.endsWith('.tsx'))
+        && !this._compilerHost.fileExists(fileName, false))
         || !this._compilerHost.fileExists(outputFile, false)) {
         let msg = `${fileName} is missing from the TypeScript compilation. `
           + `Please make sure it is in your tsconfig via the 'files' or 'include' property.`;

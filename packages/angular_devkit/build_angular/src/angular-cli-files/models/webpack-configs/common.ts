@@ -224,7 +224,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     mode: buildOptions.optimization ? 'production' : 'development',
     devtool: false,
     resolve: {
-      extensions: ['.ts', '.mjs', '.js'],
+      extensions: ['.ts', '.tsx', '.mjs', '.js'],
       symlinks: !buildOptions.preserveSymlinks,
       modules: [
         wco.tsConfig.options.baseUrl || projectRoot,

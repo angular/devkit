@@ -82,7 +82,7 @@ export function getNonAotConfig(wco: WebpackConfigOptions, host: virtualFs.Host<
   const { tsConfigPath } = wco;
 
   return {
-    module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
+    module: { rules: [{ test: /\.tsx?$/, loader: webpackLoader }] },
     plugins: [_createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }, host)]
   };
 }
@@ -114,7 +114,7 @@ export function getNonAotTestConfig(wco: WebpackConfigOptions, host: virtualFs.H
   const { tsConfigPath } = wco;
 
   return {
-    module: { rules: [{ test: /\.ts$/, loader: webpackLoader }] },
+    module: { rules: [{ test: /\.tsx?$/, loader: webpackLoader }] },
     plugins: [_createAotPlugin(wco, { tsConfigPath, skipCodeGeneration: true }, host, false)]
   };
 }
