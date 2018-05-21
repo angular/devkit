@@ -532,6 +532,18 @@ export function addBootstrapToModule(source: ts.SourceFile,
 }
 
 /**
+ * Custom function to insert an entryComponent into NgModule. It also imports it.
+ */
+export function addEntryComponentToModule(source: ts.SourceFile,
+                                          modulePath: string, classifiedName: string,
+                                          importPath: string): Change[] {
+  return addSymbolToNgModuleMetadata(
+    source, modulePath,
+    'entryComponents', classifiedName, importPath,
+  );
+}
+
+/**
  * Determine if an import already exists.
  */
 export function isImported(source: ts.SourceFile,

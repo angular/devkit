@@ -135,6 +135,14 @@ describe('Component Schematic', () => {
     expect(appModuleContent).toMatch(/exports: \[FooComponent\]/);
   });
 
+  it('should set the entry component', () => {
+    const options = { ...defaultOptions, entryComponent: true };
+
+    const tree = schematicRunner.runSchematic('component', options, appTree);
+    const appModuleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
+    expect(appModuleContent).toMatch(/entryComponents: \[FooComponent\]/);
+  });
+
   it('should import into a specified module', () => {
     const options = { ...defaultOptions, module: 'app.module.ts' };
 

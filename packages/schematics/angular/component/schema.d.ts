@@ -67,4 +67,8 @@ export interface Schema {
      * Specifies if declaring module exports the component.
      */
     export?: boolean;
+  /**
+   * Specifies if the component is an entry component of declaring module.
+   */
+    entryComponent?: boolean;
 }
