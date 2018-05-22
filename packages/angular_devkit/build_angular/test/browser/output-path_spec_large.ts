@@ -14,8 +14,8 @@ import { Timeout, browserTargetSpec, host, runTargetSpec, workspaceRoot } from '
 describe('Browser Builder output path', () => {
   const outputPath = normalize('dist');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('deletes output path', (done) => {
     // Write a file to the output path to later verify it was deleted.
@@ -31,7 +31,7 @@ describe('Browser Builder output path', () => {
         expect(buildEvent.success).toBe(false);
         expect(host.scopedSync().exists(outputPath)).toBe(false);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('does not allow output path to be project root', (done) => {

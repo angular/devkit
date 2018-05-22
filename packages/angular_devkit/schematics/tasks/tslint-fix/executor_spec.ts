@@ -29,7 +29,7 @@ describe('TsLintTaskExecutor', () => {
     const tree = new UnitTestTree(new HostTree(host));
 
     testRunner.runSchematicAsync('run-task', null, tree)
-      .subscribe(undefined, done.fail, done);
+      .toPromise().then(done, done.fail);
   });
 
   it('shows errors with config object', done => {
@@ -67,7 +67,7 @@ describe('TsLintTaskExecutor', () => {
 
         obs.complete();
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('supports custom rules in the project (pass)', done => {
@@ -91,7 +91,7 @@ describe('TsLintTaskExecutor', () => {
         testRunner.logger.subscribe(x => messages.push(x.message));
         testRunner.engine.executePostTasks().subscribe(obs);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('supports custom rules in the project (fail)', done => {
@@ -128,7 +128,7 @@ describe('TsLintTaskExecutor', () => {
 
         obs.complete();
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
 });

@@ -45,7 +45,7 @@ describe('DryRunSink', () => {
       .then(done, done.fail);
 
     sink.commit(optimize(tree))
-      .subscribe({ error: done.fail });
+      .toPromise().then(done, done.fail);
   });
 
   it('works with root', done => {
@@ -73,6 +73,6 @@ describe('DryRunSink', () => {
       .then(done, done.fail);
 
     sink.commit(optimize(tree))
-      .subscribe({ error: done.fail });
+      .toPromise().then(done, done.fail);
   });
 });

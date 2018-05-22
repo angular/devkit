@@ -14,8 +14,8 @@ import { TestLogger, extractI18nTargetSpec, host, runTargetSpec } from '../utils
 describe('Extract i18n Target', () => {
   const extractionFile = join(normalize('src'), 'messages.xlf');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
@@ -27,7 +27,7 @@ describe('Extract i18n Target', () => {
         expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
           .toMatch(/i18n test/);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('shows errors', (done) => {
@@ -41,7 +41,7 @@ describe('Extract i18n Target', () => {
         const msg = 'Could not mark an element as translatable inside a translatable section';
         expect(logger.includes(msg)).toBe(true);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports locale', (done) => {
@@ -55,7 +55,7 @@ describe('Extract i18n Target', () => {
         expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
           .toContain('source-language="fr"');
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports out file', (done) => {
@@ -71,7 +71,7 @@ describe('Extract i18n Target', () => {
         expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
           .toMatch(/i18n test/);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports output path', (done) => {
@@ -88,7 +88,7 @@ describe('Extract i18n Target', () => {
         expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
           .toMatch(/i18n test/);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports i18n format', (done) => {
@@ -103,6 +103,6 @@ describe('Extract i18n Target', () => {
         expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile)))
           .toMatch(/i18n test/);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 });

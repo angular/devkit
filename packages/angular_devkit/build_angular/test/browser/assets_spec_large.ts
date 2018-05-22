@@ -12,8 +12,8 @@ import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder assets', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     const assets: { [path: string]: string } = {
@@ -55,7 +55,7 @@ describe('Browser Builder assets', () => {
         // .gitkeep should not be there.
         expect(host.scopedSync().exists(normalize('./dist/folder/.gitkeep'))).toBe(false);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('fails with non-absolute output path', (done) => {
@@ -100,6 +100,6 @@ describe('Browser Builder assets', () => {
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       toArray(),
       tap((buildEvents) => expect(buildEvents.length).toBe(1)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 });

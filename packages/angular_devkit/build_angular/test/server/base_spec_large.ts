@@ -14,8 +14,8 @@ import { Timeout, host, runTargetSpec } from '../utils';
 describe('Server Builder', () => {
   const outputPath = normalize('dist-server');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works (base)', (done) => {
     const overrides = { };
@@ -28,7 +28,7 @@ describe('Server Builder', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(/AppServerModuleNgFactory/);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Standard);
 
   it('supports sourcemaps', (done) => {
@@ -43,6 +43,6 @@ describe('Server Builder', () => {
         expect(content).toMatch(/AppServerModuleNgFactory/);
         expect(host.scopedSync().exists(join(outputPath, 'main.js.map'))).toBeTruthy();
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Standard);
 });

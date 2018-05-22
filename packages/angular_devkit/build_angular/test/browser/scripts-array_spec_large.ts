@@ -39,8 +39,8 @@ describe('Browser Builder scripts array', () => {
     { input: 'src/pre-rename-lazy-script.js', bundleName: 'renamed-lazy-script', lazy: true },
   ];
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     const matches: { [path: string]: string } = {
@@ -72,7 +72,7 @@ describe('Browser Builder scripts array', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(matches[fileName]);
       })),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('uglifies, uses sourcemaps, and adds hashes', (done) => {
@@ -106,7 +106,7 @@ describe('Browser Builder scripts array', () => {
         expect(host.scopedSync().exists(normalize('dist/renamed-lazy-script.js.map')))
           .toBe(true);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 
   it('preserves script order', (done) => {
@@ -130,6 +130,6 @@ describe('Browser Builder scripts array', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(re);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 });

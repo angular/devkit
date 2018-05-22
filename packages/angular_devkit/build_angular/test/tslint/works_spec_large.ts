@@ -15,13 +15,13 @@ import { TestLogger, host, runTargetSpec, tslintTargetSpec } from '../utils';
 describe('Tslint Target', () => {
   const filesWithErrors = { 'src/foo.ts': 'const foo = "";\n' };
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     runTargetSpec(host, tslintTargetSpec).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports exclude', (done) => {
@@ -30,7 +30,7 @@ describe('Tslint Target', () => {
 
     runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports fix', (done) => {
@@ -44,7 +44,7 @@ describe('Tslint Target', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         expect(content).toContain(`const foo = '';`);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports force', (done) => {
@@ -58,7 +58,7 @@ describe('Tslint Target', () => {
         expect(logger.includes(`" should be '`)).toBe(true);
         expect(logger.includes(`Lint errors found in the listed files`)).toBe(true);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports format', (done) => {
@@ -71,7 +71,7 @@ describe('Tslint Target', () => {
       tap(() => {
         expect(logger.includes(`quotemark`)).toBe(true);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports finding configs', (done) => {
@@ -92,7 +92,7 @@ describe('Tslint Target', () => {
 
     runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports overriding configs', (done) => {
@@ -113,7 +113,7 @@ describe('Tslint Target', () => {
 
     runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports using files with no project', (done) => {
@@ -124,7 +124,7 @@ describe('Tslint Target', () => {
 
     runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports using one project as a string', (done) => {
@@ -134,7 +134,7 @@ describe('Tslint Target', () => {
 
     runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports using one project as an array', (done) => {
@@ -144,7 +144,7 @@ describe('Tslint Target', () => {
 
     runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports using two projects', (done) => {
@@ -154,7 +154,7 @@ describe('Tslint Target', () => {
 
     runTargetSpec(host, tslintTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('errors when type checking is used without a project', (done) => {

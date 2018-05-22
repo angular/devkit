@@ -61,7 +61,7 @@ describe('Architect', () => {
   beforeAll((done) => workspace.loadWorkspaceFromJson(workspaceJson).pipe(
     concatMap(ws => new Architect(ws).loadArchitect()),
     tap(arch => architect = arch),
-  ).subscribe(undefined, done.fail, done));
+  ).toPromise().then(done, done.fail));
 
   it('works', () => {
     const targetSpec = { project: 'app', target: 'browser', configuration: 'prod' };
@@ -101,24 +101,24 @@ describe('Architect', () => {
         expect(events[1].success).toBe(false);
         expect(events[2].success).toBe(true);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('errors when builder cannot be resolved', (done) => {
     const targetSpec = { project: 'app', target: 'karma' };
     const builderConfig = architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec);
-    architect.run(builderConfig).subscribe(undefined, (err: Error) => {
+    architect.run(builderConfig).toPromise().then(() => done.fail(), (err: Error) => {
       expect(err).toEqual(jasmine.any(BuilderCannotBeResolvedException));
       done();
-    }, done.fail);
+    });
   });
 
   it('errors when builder options fail validation', (done) => {
     const targetSpec = { project: 'app', target: 'badBrowser' };
     const builderConfig = architect.getBuilderConfiguration<BrowserTargetOptions>(targetSpec);
-    architect.run(builderConfig).subscribe(undefined, (err: Error) => {
+    architect.run(builderConfig).toPromise().then(() => done.fail(), (err: Error) => {
       expect(err).toEqual(jasmine.any(schema.SchemaValidationException));
       done();
-    }, done.fail);
+    });
   });
 });

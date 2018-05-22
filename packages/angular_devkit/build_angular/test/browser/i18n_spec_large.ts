@@ -22,8 +22,8 @@ describe('Browser Builder i18n', () => {
         </file>
       </xliff>`;
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('uses translations', (done) => {
     host.writeMultipleFiles({
@@ -60,7 +60,7 @@ describe('Browser Builder i18n', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(/Bonjour i18n!/);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('ignores missing translations', (done) => {
@@ -82,7 +82,7 @@ describe('Browser Builder i18n', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(/Other content/);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('reports errors for missing translations', (done) => {
@@ -99,7 +99,7 @@ describe('Browser Builder i18n', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('register locales', (done) => {
@@ -113,6 +113,6 @@ describe('Browser Builder i18n', () => {
         expect(content).toMatch(/registerLocaleData/);
         expect(content).toMatch(/angular_common_locales_fr/);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 });

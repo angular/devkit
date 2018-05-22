@@ -21,6 +21,6 @@ describe('NodeWorkflow', () => {
       collection,
       schematic: 'ng-new',
       options: { name: 'workflow-test', version: '6.0.0-rc.4' },
-    }).subscribe(undefined, done.fail, done);
+    }).toPromise().then(done, done.fail);
   });
 });

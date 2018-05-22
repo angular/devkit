@@ -14,8 +14,8 @@ import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 describe('Browser Builder source map', () => {
   const outputPath = normalize('dist');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     const overrides = { sourceMap: true };
@@ -26,7 +26,7 @@ describe('Browser Builder source map', () => {
         const fileName = join(outputPath, 'main.js.map');
         expect(host.scopedSync().exists(fileName)).toBe(true);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('does not output source map when disabled', (done) => {
@@ -38,7 +38,7 @@ describe('Browser Builder source map', () => {
         const fileName = join(outputPath, 'main.js.map');
         expect(host.scopedSync().exists(fileName)).toBe(false);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('supports eval source map', (done) => {
@@ -52,6 +52,6 @@ describe('Browser Builder source map', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         expect(content).toContain('eval("function webpackEmptyAsyncContext');
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 });

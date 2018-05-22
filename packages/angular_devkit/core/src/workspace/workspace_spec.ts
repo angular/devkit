@@ -112,7 +112,7 @@ describe('Workspace', () => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getProject('app').root).toEqual(workspaceJson.projects['app'].root)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('loads workspace from host', (done) => {
@@ -121,16 +121,16 @@ describe('Workspace', () => {
     const workspace = new Workspace(workspaceRoot, host);
     workspace.loadWorkspaceFromHost(normalize('angular-workspace.json')).pipe(
       tap((ws) => expect(ws.getProject('app').root).toEqual(workspaceJson.projects['app'].root)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('errors when workspace fails validation', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson({ foo: 'bar' })
-      .subscribe(undefined, (err) => {
+      .toPromise().then(() => done.fail, (err) => {
         expect(err).toEqual(jasmine.any(schema.SchemaValidationException));
         done();
-      }, done.fail);
+      });
   });
 
   it('throws when getting information before workspace is loaded', () => {
@@ -157,42 +157,42 @@ describe('Workspace', () => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.version).toEqual(workspaceJson.version)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets workspace new project root', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.newProjectRoot).toEqual(workspaceJson.newProjectRoot)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('lists project names', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.listProjectNames()).toEqual(['app'])),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets project by name', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getProject('app')).toEqual(appProject)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('throws on missing project', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(() => ws.getProject('abc')).toThrow(new ProjectNotFoundException('abc'))),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets default project', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getDefaultProjectName()).toEqual('app')),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets default project when there is a single one', (done) => {
@@ -200,7 +200,7 @@ describe('Workspace', () => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(customWorkspaceJson).pipe(
       tap((ws) => expect(ws.getDefaultProjectName()).toEqual('app')),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets default project returns null when there is none', (done) => {
@@ -208,14 +208,14 @@ describe('Workspace', () => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(customWorkspaceJson).pipe(
       tap((ws) => expect(ws.getDefaultProjectName()).toEqual(null)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets project by path', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getProjectByPath(ws.root)).toEqual('app')),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets closest project by path', (done) => {
@@ -228,28 +228,28 @@ describe('Workspace', () => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(customWorkspaceJson).pipe(
       tap((ws) => expect(ws.getProjectByPath(anotherAppRoot)).toEqual('another-app')),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets workspace cli', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getCli()).toEqual(workspaceJson.cli as WorkspaceTool)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets workspace schematics', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getSchematics()).toEqual(workspaceJson.schematics as WorkspaceTool)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets workspace architect', (done) => {
     const workspace = new Workspace(root, host);
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getArchitect()).toEqual(workspaceJson.architect as WorkspaceTool)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets project cli', (done) => {
@@ -257,7 +257,7 @@ describe('Workspace', () => {
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getProjectCli('app'))
         .toEqual(workspaceJson.projects.app.cli as WorkspaceTool)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets project schematics', (done) => {
@@ -265,7 +265,7 @@ describe('Workspace', () => {
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getProjectSchematics('app'))
         .toEqual(workspaceJson.projects.app.schematics as WorkspaceTool)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
   it('gets project architect', (done) => {
@@ -273,7 +273,7 @@ describe('Workspace', () => {
     workspace.loadWorkspaceFromJson(workspaceJson).pipe(
       tap((ws) => expect(ws.getProjectArchitect('app'))
         .toEqual(workspaceJson.projects.app.architect as WorkspaceTool)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 
 });

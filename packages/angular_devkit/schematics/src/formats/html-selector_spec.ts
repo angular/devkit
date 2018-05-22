@@ -20,7 +20,7 @@ describe('Schematics HTML selector format', () => {
 
     formatValidator(data, dataSchema, [htmlSelectorFormat])
       .pipe(map(result => expect(result.success).toBe(true)))
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
   it('rejects selectors starting with invalid characters', done => {
@@ -31,7 +31,7 @@ describe('Schematics HTML selector format', () => {
 
     formatValidator(data, dataSchema, [htmlSelectorFormat])
       .pipe(map(result => expect(result.success).toBe(false)))
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
   it('rejects selectors starting with number', done => {
@@ -42,7 +42,7 @@ describe('Schematics HTML selector format', () => {
 
     formatValidator(data, dataSchema, [htmlSelectorFormat])
       .pipe(map(result => expect(result.success).toBe(false)))
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
   it('rejects selectors with non-letter after dash', done => {
@@ -53,6 +53,6 @@ describe('Schematics HTML selector format', () => {
 
     formatValidator(data, dataSchema, [htmlSelectorFormat])
       .pipe(map(result => expect(result.success).toBe(false)))
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 });

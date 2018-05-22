@@ -11,8 +11,8 @@ import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder poll', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     const overrides = { watch: true, poll: 1000 };

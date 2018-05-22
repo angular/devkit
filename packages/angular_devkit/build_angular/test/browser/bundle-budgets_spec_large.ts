@@ -12,8 +12,8 @@ import { TestLogger, Timeout, browserTargetSpec, host, runTargetSpec } from '../
 
 describe('Browser Builder bundle budgets', () => {
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('accepts valid bundles', (done) => {
     const overrides = {
@@ -26,7 +26,7 @@ describe('Browser Builder bundle budgets', () => {
     runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('WARNING')).toBe(false)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 
   it('shows errors', (done) => {
@@ -37,7 +37,7 @@ describe('Browser Builder bundle budgets', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(false)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 
   it('shows warnings', (done) => {
@@ -51,6 +51,6 @@ describe('Browser Builder bundle budgets', () => {
     runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('WARNING')).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 });

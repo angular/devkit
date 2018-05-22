@@ -99,13 +99,13 @@ describe('visitJson', () => {
       } else {
         return from(Promise.resolve('abc'));
       }
-    }).subscribe({
-      next: result => {
+    }).toPromise().then(
+      result => {
         expect(result).toEqual({ a: { b: { c: ['_1', '_2', '_3'] } } });
+        done();
       },
-      complete: done,
-      error: done.fail,
-    });
+      done.fail,
+    );
   });
 
   it('works with schema', () => {

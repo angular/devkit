@@ -12,8 +12,8 @@ import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
 
 
 describe('Dev Server Builder', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     runTargetSpec(host, devServerTargetSpec).pipe(
@@ -21,6 +21,6 @@ describe('Dev Server Builder', () => {
       concatMap(() => from(request('http://localhost:4200/index.html'))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
       take(1),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 });

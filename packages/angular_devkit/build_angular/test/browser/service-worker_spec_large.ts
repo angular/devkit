@@ -38,8 +38,8 @@ describe('Browser Builder', () => {
     ],
   };
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('errors if no ngsw-config.json is present', (done) => {
     const overrides = { serviceWorker: true };
@@ -102,7 +102,7 @@ describe('Browser Builder', () => {
           },
         });
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('works with service worker and baseHref', (done) => {
@@ -157,6 +157,6 @@ describe('Browser Builder', () => {
           },
         });
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 });

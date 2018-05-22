@@ -14,8 +14,8 @@ import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
 
 
 describe('Dev Server Builder ssl', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     const overrides: Partial<DevServerBuilderOptions> = { ssl: true };
@@ -25,7 +25,7 @@ describe('Dev Server Builder ssl', () => {
       concatMap(() => from(request('https://localhost:4200/index.html'))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
       take(1),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('supports key and cert', (done) => {
@@ -97,6 +97,6 @@ describe('Dev Server Builder ssl', () => {
       concatMap(() => from(request('https://localhost:4200/index.html'))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
       take(1),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 });

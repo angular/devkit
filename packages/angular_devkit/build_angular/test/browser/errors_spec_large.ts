@@ -11,8 +11,8 @@ import { TestLogger, Timeout, browserTargetSpec, host, runTargetSpec } from '../
 
 
 describe('Browser Builder errors', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('shows error when files are not part of the compilation', (done) => {
     host.replaceInFile('src/tsconfig.app.json', '"compilerOptions": {', `
@@ -26,7 +26,7 @@ describe('Browser Builder errors', () => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('polyfills.ts is missing from the TypeScript')).toBe(true);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('shows TS syntax errors', (done) => {
@@ -38,7 +38,7 @@ describe('Browser Builder errors', () => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('Declaration or statement expected.')).toBe(true);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('shows static analysis errors', (done) => {
@@ -50,7 +50,7 @@ describe('Browser Builder errors', () => {
         expect(buildEvent.success).toBe(false);
         expect(logger.includes('Function expressions are not supported in')).toBe(true);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
 });

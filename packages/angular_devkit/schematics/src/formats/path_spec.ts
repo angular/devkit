@@ -20,7 +20,7 @@ describe('Schematics Path format', () => {
 
     formatValidator(data, dataSchema, [pathFormat])
       .pipe(map(result => expect(result.success).toBe(true)))
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
   it('rejects Paths that are not normalized', done => {
@@ -31,6 +31,6 @@ describe('Schematics Path format', () => {
 
     formatValidator(data, dataSchema, [pathFormat])
       .pipe(map(result => expect(result.success).toBe(false)))
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 });

@@ -15,8 +15,8 @@ import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
 
 
 describe('Dev Server Builder proxy', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     // Create an express app that serves as a proxy.
@@ -47,7 +47,7 @@ describe('Dev Server Builder proxy', () => {
         server.close();
       }),
       take(1),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('errors out with a missing proxy file', (done) => {

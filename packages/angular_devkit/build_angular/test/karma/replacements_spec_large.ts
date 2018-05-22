@@ -12,8 +12,8 @@ import { host, karmaTargetSpec, runTargetSpec } from '../utils';
 
 
 describe('Karma Builder file replacements', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('allows file replacements', (done) => {
     host.writeMultipleFiles({
@@ -40,6 +40,6 @@ describe('Karma Builder file replacements', () => {
 
     runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 });

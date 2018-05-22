@@ -13,8 +13,8 @@ import { lazyModuleFiles, lazyModuleImport } from './lazy-module_spec_large';
 
 
 describe('Browser Builder output hashing', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('updates hash as content changes', (done) => {
     const OUTPUT_RE = /(main|styles|lazy\.module)\.([a-z0-9]+)\.(chunk|bundle)\.(js|css)$/;
@@ -105,7 +105,7 @@ describe('Browser Builder output hashing', () => {
         newHashes = generateFileHashMap();
         validateHashes(oldHashes, newHashes, []);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Massive);
 
   it('supports options', (done) => {
@@ -158,6 +158,6 @@ describe('Browser Builder output hashing', () => {
         expect(host.fileMatchExists('dist', /styles\.[0-9a-f]{20}\.css/)).toBeTruthy();
         expect(host.fileMatchExists('dist', /spectrum\.[0-9a-f]{20}\.png/)).toBeFalsy();
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 });

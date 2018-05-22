@@ -14,8 +14,8 @@ import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 describe('Browser Builder works with BOM index.html', () => {
   const outputPath = normalize('dist');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works with UTF-8 BOM', (done) => {
     host.writeMultipleFiles({
@@ -32,7 +32,7 @@ describe('Browser Builder works with BOM index.html', () => {
         // tslint:disable-next-line:max-line-length
         expect(content).toBe(`<html><head><base href="/"></head><body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('works with UTF16 LE BOM', (done) => {
@@ -50,7 +50,7 @@ describe('Browser Builder works with BOM index.html', () => {
         // tslint:disable-next-line:max-line-length
         expect(content).toBe(`<html><head><base href="/"></head><body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('keeps escaped charaters', (done) => {
@@ -69,7 +69,7 @@ describe('Browser Builder works with BOM index.html', () => {
         // tslint:disable-next-line:max-line-length
         expect(content).toBe(`<html><head><title>&iacute;</title><base href="/"></head> <body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('keeps custom template charaters', (done) => {
@@ -88,6 +88,6 @@ describe('Browser Builder works with BOM index.html', () => {
         // tslint:disable-next-line:max-line-length
         expect(content).toBe(`<html><head><base href="/"><%= csrf_meta_tags %></head> <body><app-root></app-root><script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body></html>`);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 });

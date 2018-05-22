@@ -31,10 +31,7 @@ describe('NodeJsAsyncHost', () => {
     root = temp.mkdirSync('core-node-spec-');
     host = new virtualFs.ScopedHost(new NodeJsAsyncHost(), normalize(root));
   });
-  afterEach(done => {
-    host.delete(normalize('/'))
-      .subscribe({ complete() { done(); } });
-  });
+  afterEach(done => host.delete(normalize('/')).toPromise().then(done, done.fail));
 
   linuxOnlyIt('can watch', done => {
     let obs: Observable<virtualFs.HostWatchEvent>;

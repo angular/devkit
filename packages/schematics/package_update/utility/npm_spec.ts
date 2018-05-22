@@ -36,7 +36,7 @@ describe('Schematic Update', () => {
     const rule = updatePackageJson(['@angular/core', '@angular/compiler'], '4.1.0', false);
 
     schematicRunner.callRule(rule, inputTree)
-      .subscribe(outputTree => {
+      .toPromise().then(outputTree => {
         const packageJson = JSON.parse(outputTree.read('/package.json') !.toString());
 
         expect(packageJson.dependencies['@angular/core']).toBe('4.1.0');
@@ -44,14 +44,14 @@ describe('Schematic Update', () => {
         expect(packageJson.dependencies['rxjs']).toMatch(/^\^5\.\d+\.\d+$/);
 
         done();
-      }, (err) => done.fail(err));
+      }, done.fail);
   });
 
   it('works with a peer dependencies', done => {
     const rule = updatePackageJson(['@angular/compiler'], '4.1.0', false);
 
     schematicRunner.callRule(rule, inputTree)
-                   .subscribe(outputTree => {
+                    .toPromise().then(outputTree => {
                      const packageJson = JSON.parse(outputTree.read('/package.json') !.toString());
 
                      expect(packageJson.dependencies['@angular/core']).toBe('4.1.0');
@@ -59,14 +59,14 @@ describe('Schematic Update', () => {
                      expect(packageJson.dependencies['rxjs']).toMatch(/^\^5\.\d+\.\d+$/);
 
                      done();
-                   }, (err) => done.fail(err));
+                   }, done.fail);
   });
 
   it('works with a loose version', done => {
     const rule = updatePackageJson(['@angular/core', '@angular/compiler'], '~4.1.0', true);
 
     schematicRunner.callRule(rule, inputTree)
-      .subscribe(outputTree => {
+      .toPromise().then(outputTree => {
         const packageJson = JSON.parse(outputTree.read('/package.json') !.toString());
 
         expect(packageJson.dependencies['@angular/core']).toBe('~4.1.3');
@@ -74,13 +74,13 @@ describe('Schematic Update', () => {
         expect(packageJson.dependencies['rxjs']).toMatch(/^\^5\.\d+\.\d+$/);
 
         done();
-      }, (err) => done.fail(err));
+      }, done.fail);
   });
 
   it('fails with an invalid version', done => {
     const rule = updatePackageJson(['@angular/core'], 'babababarbaraann');
 
     schematicRunner.callRule(rule, inputTree)
-      .subscribe(() => done.fail('version should not match.'), () => done());
+      .toPromise().then(() => done.fail('version should not match.'), () => done());
   });
 });

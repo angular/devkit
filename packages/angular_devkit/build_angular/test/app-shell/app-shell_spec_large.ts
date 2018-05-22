@@ -11,8 +11,8 @@ import { Timeout, host, runTargetSpec } from '../utils';
 
 
 describe('AppShell Builder', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works (basic)', done => {
     host.replaceInFile('src/app/app.module.ts', /    BrowserModule/, `
@@ -44,7 +44,7 @@ describe('AppShell Builder', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(/Welcome to app!/);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
 
   }, Timeout.Complex);
 });

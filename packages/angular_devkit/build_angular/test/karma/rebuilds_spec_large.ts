@@ -15,8 +15,8 @@ import { host, karmaTargetSpec, runTargetSpec } from '../utils';
 // - karma does not have a way to close the server gracefully.
 // TODO: fix these before 6.0 final.
 xdescribe('Karma Builder watch mode', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     const overrides = { watch: true };
@@ -24,7 +24,7 @@ xdescribe('Karma Builder watch mode', () => {
       debounceTime(500),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       take(1),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('recovers from compilation failures in watch mode', (done) => {
@@ -61,6 +61,6 @@ xdescribe('Karma Builder watch mode', () => {
         }
       }),
       take(3),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 });

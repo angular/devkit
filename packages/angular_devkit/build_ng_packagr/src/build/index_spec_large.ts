@@ -37,7 +37,7 @@ describe('NgPackagr Builder', () => {
       concatMap(ws => new Architect(ws).loadArchitect()),
       concatMap(arch => arch.run(arch.getBuilderConfiguration(targetSpec))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   linuxOnlyIt('tests works', (done) => {
@@ -47,7 +47,7 @@ describe('NgPackagr Builder', () => {
       concatMap(ws => new Architect(ws).loadArchitect()),
       concatMap(arch => arch.run(arch.getBuilderConfiguration(targetSpec))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 45000);
 
   it('lint works', (done) => {
@@ -57,6 +57,6 @@ describe('NgPackagr Builder', () => {
       concatMap(ws => new Architect(ws).loadArchitect()),
       concatMap(arch => arch.run(arch.getBuilderConfiguration(targetSpec))),
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 });

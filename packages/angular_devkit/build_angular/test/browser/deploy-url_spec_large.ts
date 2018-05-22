@@ -14,8 +14,8 @@ import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 describe('Browser Builder deploy url', () => {
   const outputPath = normalize('dist');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('uses deploy url for bundles urls', (done) => {
     const overrides = { deployUrl: 'deployUrl/' };
@@ -35,7 +35,7 @@ describe('Browser Builder deploy url', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toContain('http://example.com/some/path/main.js');
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('uses deploy url for in webpack runtime', (done) => {
@@ -48,7 +48,7 @@ describe('Browser Builder deploy url', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toContain('deployUrl/');
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
 });

@@ -19,13 +19,13 @@ if (process.platform.startsWith('win')) {
 
 
 describe('Protractor Builder', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   linuxOnlyIt('works', (done) => {
     runTargetSpec(host, protractorTargetSpec).pipe(
       retry(3),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   linuxOnlyIt('works with no devServerTarget', (done) => {
@@ -44,7 +44,7 @@ describe('Protractor Builder', () => {
 
     runTargetSpec(host, protractorTargetSpec, overrides).pipe(
       retry(3),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 60000);
 
   linuxOnlyIt('overrides protractor suites', (done) => {
@@ -63,7 +63,7 @@ describe('Protractor Builder', () => {
 
     runTargetSpec(host, protractorTargetSpec, overrides).pipe(
       retry(3),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 60000);
 
   // TODO: test `element-explorer` when the protractor builder emits build events with text.

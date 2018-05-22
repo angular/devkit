@@ -14,8 +14,8 @@ import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 describe('Browser Builder stats json', () => {
   const outputPath = normalize('dist');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     const overrides = { statsJson: true };
@@ -26,6 +26,6 @@ describe('Browser Builder stats json', () => {
         const fileName = join(outputPath, 'stats.json');
         expect(host.scopedSync().exists(fileName)).toBe(true);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 });

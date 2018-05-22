@@ -11,8 +11,8 @@ import { host, karmaTargetSpec, runTargetSpec } from '../utils';
 
 
 describe('Karma Builder assets', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     const assets: { [path: string]: string } = {
@@ -101,6 +101,6 @@ describe('Karma Builder assets', () => {
 
     runTargetSpec(host, karmaTargetSpec, overrides).pipe(
       tap(buildEvent => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 45000);
 });

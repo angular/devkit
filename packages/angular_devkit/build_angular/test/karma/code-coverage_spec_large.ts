@@ -15,8 +15,8 @@ import { host, karmaTargetSpec, runTargetSpec } from '../utils';
 describe('Karma Builder code coverage', () => {
   const coverageFilePath = normalize('coverage/lcov.info');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     const overrides: Partial<NormalizedKarmaBuilderSchema> = { codeCoverage: true };
@@ -31,7 +31,7 @@ describe('Karma Builder code coverage', () => {
         expect(content).toContain('polyfills.ts');
         expect(content).toContain('test.ts');
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 120000);
 
   it('supports exclude', (done) => {
@@ -53,6 +53,6 @@ describe('Karma Builder code coverage', () => {
         expect(content).not.toContain('polyfills.ts');
         expect(content).not.toContain('test.ts');
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 120000);
 });

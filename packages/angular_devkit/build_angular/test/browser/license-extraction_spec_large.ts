@@ -14,8 +14,8 @@ import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 describe('Browser Builder license extraction', () => {
   const outputPath = normalize('dist');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   // Ignored because license works when trying manually on a project, but doesn't work here.
   // TODO: fix VFS use in webpack and the test host, and reenable this test.
@@ -29,6 +29,6 @@ describe('Browser Builder license extraction', () => {
         const fileName = join(outputPath, '3rdpartylicenses.txt');
         expect(host.scopedSync().exists(fileName)).toBe(true);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 });

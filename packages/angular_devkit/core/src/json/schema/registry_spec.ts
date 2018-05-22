@@ -41,7 +41,7 @@ describe('CoreSchemaRegistry', () => {
           expect(data.tslint).not.toBeUndefined();
         }),
       )
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
   it('supports pre transforms', done => {
@@ -78,7 +78,7 @@ describe('CoreSchemaRegistry', () => {
           expect(data.obj.num).toBeUndefined();
         }),
       )
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
   it('supports local references', done => {
@@ -104,7 +104,7 @@ describe('CoreSchemaRegistry', () => {
           expect(data.numbers.one).not.toBeUndefined();
         }),
     )
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
   it('fails on invalid additionalProperties', done => {
@@ -125,7 +125,7 @@ describe('CoreSchemaRegistry', () => {
             'should NOT have additional properties');
         }),
     )
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
   it('fails on invalid additionalProperties async', done => {
@@ -148,7 +148,7 @@ describe('CoreSchemaRegistry', () => {
           expect(result.errors && result.errors[0].keyword).toBe('additionalProperties');
         }),
       )
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
 
@@ -213,7 +213,7 @@ describe('CoreSchemaRegistry', () => {
           expect(result.success).toBe(true);
         }),
       )
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
   it('supports async format', done => {
@@ -242,7 +242,7 @@ describe('CoreSchemaRegistry', () => {
           expect(result.success).toBe(true);
         }),
       )
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
   it('shows dataPath and message on error', done => {
@@ -275,7 +275,7 @@ describe('CoreSchemaRegistry', () => {
           expect(result.errors && (result.errors[0].params as any).format).toBe('is-hotdog');
         }),
       )
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 
   it('supports smart defaults', done => {
@@ -365,6 +365,6 @@ describe('CoreSchemaRegistry', () => {
           expect(data.obj.deep.arr).toEqual([1, 2, 3]);
         }),
       )
-      .subscribe(done, done.fail);
+      .toPromise().then(done, done.fail);
   });
 });

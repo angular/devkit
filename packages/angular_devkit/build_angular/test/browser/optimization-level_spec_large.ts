@@ -14,8 +14,8 @@ import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 describe('Browser Builder optimization level', () => {
   const outputPath = normalize('dist');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     const overrides = { optimization: true };
@@ -28,7 +28,7 @@ describe('Browser Builder optimization level', () => {
         // Bundle contents should be uglified, which includes variable mangling.
         expect(content).not.toContain('AppComponent');
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 
   it('tsconfig target changes optimizations to use ES2015', (done) => {
@@ -43,6 +43,6 @@ describe('Browser Builder optimization level', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         expect(content).toMatch(/class \w{constructor\(\){/);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 });

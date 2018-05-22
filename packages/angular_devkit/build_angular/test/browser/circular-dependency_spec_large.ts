@@ -11,8 +11,8 @@ import { TestLogger, Timeout, browserTargetSpec, host, runTargetSpec } from '../
 
 
 describe('Browser Builder circular dependency detection', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     host.appendToFile('src/app/app.component.ts',
@@ -24,6 +24,6 @@ describe('Browser Builder circular dependency detection', () => {
     runTargetSpec(host, browserTargetSpec, overrides, logger).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => expect(logger.includes('Circular dependency detected')).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 });

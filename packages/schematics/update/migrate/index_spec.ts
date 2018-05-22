@@ -53,6 +53,6 @@ describe('@schematics/update:migrate', () => {
           'migration-20', // "2"
         ]);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   });
 });

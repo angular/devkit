@@ -17,8 +17,8 @@ describe('Dev Server Builder public host', () => {
   // check the hosts anymore when requests come from numeric IP addresses.
   const headers = { host: 'http://spoofy.mcspoofface' };
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     runTargetSpec(host, devServerTargetSpec).pipe(
@@ -26,7 +26,7 @@ describe('Dev Server Builder public host', () => {
       concatMap(() => from(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('Invalid Host header')),
       take(1),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('works', (done) => {
@@ -37,7 +37,7 @@ describe('Dev Server Builder public host', () => {
       concatMap(() => from(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
       take(1),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it('works', (done) => {
@@ -48,6 +48,6 @@ describe('Dev Server Builder public host', () => {
       concatMap(() => from(request('http://localhost:4200/', headers))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
       take(1),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 });

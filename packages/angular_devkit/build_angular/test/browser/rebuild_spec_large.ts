@@ -22,8 +22,8 @@ if (process.platform.startsWith('win')) {
 describe('Browser Builder rebuilds', () => {
   const outputPath = normalize('dist');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
 
   it('rebuilds on TS file changes', (done) => {
@@ -120,7 +120,7 @@ describe('Browser Builder rebuilds', () => {
         }
       }),
       take(3),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Massive);
 
   it('rebuilds on CSS changes', (done) => {
@@ -131,7 +131,7 @@ describe('Browser Builder rebuilds', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => host.appendToFile('src/app/app.component.css', ':host { color: blue; }')),
       take(2),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Massive);
 
   it('type checks on rebuilds', (done) => {
@@ -190,7 +190,7 @@ describe('Browser Builder rebuilds', () => {
         }
       }),
       take(4),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Massive);
 
   it('rebuilds on type changes', (done) => {
@@ -204,7 +204,7 @@ describe('Browser Builder rebuilds', () => {
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
       tap(() => host.writeMultipleFiles({ 'src/type.ts': `export type MyType = string;` })),
       take(2),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
 
@@ -266,7 +266,7 @@ describe('Browser Builder rebuilds', () => {
         }
       }),
       take(5),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 
 
@@ -345,6 +345,6 @@ describe('Browser Builder rebuilds', () => {
         }
       }),
       take(7),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 });

@@ -11,8 +11,8 @@ import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 
 
 describe('Browser Builder no entry module', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     // Remove the bootstrap but keep a reference to AppModule so the import is not elided.
@@ -23,6 +23,6 @@ describe('Browser Builder no entry module', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 });

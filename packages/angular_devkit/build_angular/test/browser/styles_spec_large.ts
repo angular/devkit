@@ -20,8 +20,8 @@ describe('Browser Builder styles', () => {
     </svg>
   `;
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('supports global styles', (done) => {
     const styles: { [path: string]: string } = {
@@ -102,7 +102,7 @@ describe('Browser Builder styles', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(jsIndexMatches[fileName]);
       })),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it('supports empty styleUrls in components', (done) => {
@@ -125,7 +125,7 @@ describe('Browser Builder styles', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   extensionsWithImportSupport.forEach(ext => {
@@ -178,7 +178,7 @@ describe('Browser Builder styles', () => {
           const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
           expect(content).toMatch(matches[fileName]);
         })),
-      ).subscribe(undefined, done.fail, done);
+      ).toPromise().then(done, done.fail);
     }, Timeout.Basic);
   });
 
@@ -204,7 +204,7 @@ describe('Browser Builder styles', () => {
 
       runTargetSpec(host, browserTargetSpec, overrides).pipe(
         tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-      ).subscribe(undefined, done.fail, done);
+      ).toPromise().then(done, done.fail);
     }, Timeout.Basic);
   });
 
@@ -219,7 +219,7 @@ describe('Browser Builder styles', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 
   extensionsWithVariableSupport.forEach(ext => {
@@ -272,7 +272,7 @@ describe('Browser Builder styles', () => {
           const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
           expect(content).toMatch(matches[fileName]);
         })),
-      ).subscribe(undefined, done.fail, done);
+      ).toPromise().then(done, done.fail);
     }, Timeout.Standard);
   });
 
@@ -329,7 +329,7 @@ describe('Browser Builder styles', () => {
       // if (stdout.match(/postcss-url: \.+: Can't read file '\.+', ignoring/)) {
       //   throw new Error('Expected no postcss-url file read warnings.');
       // }
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it(`supports font-awesome imports`, (done) => {
@@ -344,7 +344,7 @@ describe('Browser Builder styles', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 
   it(`uses autoprefixer`, (done) => {
@@ -367,7 +367,7 @@ describe('Browser Builder styles', () => {
           /*! important-comment */
           div { -ms-flex: 1; flex: 1 }`);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 
   it(`minimizes css`, (done) => {
@@ -388,7 +388,7 @@ describe('Browser Builder styles', () => {
         expect(content).toContain(
           '/*! important-comment */div{-ms-flex:1;flex:1}');
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Complex);
 
   // TODO: consider making this a unit test in the url processing plugins.
@@ -513,7 +513,7 @@ describe('Browser Builder styles', () => {
         expect(styles).toContain(`url('/base/assets/global-img-absolute.svg')`);
         expect(main).toContain(`url('/base/assets/component-img-absolute.svg')`);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 90000);
 
   it(`supports bootstrap@4`, (done) => {
@@ -525,6 +525,6 @@ describe('Browser Builder styles', () => {
 
     runTargetSpec(host, browserTargetSpec, overrides).pipe(
       tap((buildEvent) => expect(buildEvent.success).toBe(true)),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 });

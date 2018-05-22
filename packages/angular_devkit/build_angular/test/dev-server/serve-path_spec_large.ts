@@ -13,8 +13,8 @@ import { devServerTargetSpec, host, request, runTargetSpec } from '../utils';
 
 
 describe('Dev Server Builder serve path', () => {
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   // TODO: review this test, it seems to pass with or without the servePath.
   it('works', (done) => {
@@ -27,6 +27,6 @@ describe('Dev Server Builder serve path', () => {
       concatMap(() => from(request('http://localhost:4200/test/abc/'))),
       tap(response => expect(response).toContain('<title>HelloWorldApp</title>')),
       take(1),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 30000);
 });

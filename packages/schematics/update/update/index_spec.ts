@@ -49,7 +49,7 @@ describe('@schematics/update', () => {
           },
         ]);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 45000);
 
   it('respects existing tilde and caret ranges', done => {
@@ -71,7 +71,7 @@ describe('@schematics/update', () => {
         expect(packageJson['dependencies']['@angular-devkit-tests/update-migrations'])
           .toBe('~1.6.0');
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 45000);
 
   it('calls migration tasks', done => {
@@ -107,7 +107,7 @@ describe('@schematics/update', () => {
           },
         ]);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 45000);
 
   it('updates Angular as compatible with Angular N-1', done => {
@@ -148,7 +148,7 @@ describe('@schematics/update', () => {
           },
         ]);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 45000);
 
   it('updates Angular as compatible with Angular N-1 (2)', done => {
@@ -193,7 +193,7 @@ describe('@schematics/update', () => {
           },
         ]);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 45000);
 
   it('can migrate only', done => {
@@ -226,7 +226,7 @@ describe('@schematics/update', () => {
           },
         ]);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 45000);
 
   it('can migrate from only', done => {
@@ -263,7 +263,7 @@ describe('@schematics/update', () => {
           },
         ]);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 45000);
 
   it('can install and migrate with --from (short version number)', done => {
@@ -300,6 +300,6 @@ describe('@schematics/update', () => {
           },
         ]);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, 45000);
 });

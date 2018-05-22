@@ -14,8 +14,8 @@ import { Timeout, browserTargetSpec, host, runTargetSpec } from '../utils';
 describe('Browser Builder subresource integrity', () => {
   const outputPath = normalize('dist');
 
-  beforeEach(done => host.initialize().subscribe(undefined, done.fail, done));
-  afterEach(done => host.restore().subscribe(undefined, done.fail, done));
+  beforeEach(done => host.initialize().toPromise().then(done, done.fail));
+  afterEach(done => host.restore().toPromise().then(done, done.fail));
 
   it('works', (done) => {
     host.writeMultipleFiles({
@@ -32,6 +32,6 @@ describe('Browser Builder subresource integrity', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
         expect(content).toMatch(/integrity="\w+-[A-Za-z0-9\/\+=]+"/);
       }),
-    ).subscribe(undefined, done.fail, done);
+    ).toPromise().then(done, done.fail);
   }, Timeout.Basic);
 });
