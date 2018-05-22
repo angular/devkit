@@ -11,21 +11,21 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
+import { LoggingCallback, WebpackBuilder } from '@angular-devkit/build-webpack';
 import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
-import { Observable, concat, of } from 'rxjs';
+import { Observable, concat, of, throwError } from 'rxjs';
 import { concatMap, last, tap } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
-import * as webpack from 'webpack';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
   getAotConfig,
   getBrowserConfig,
   getCommonConfig,
   getNonAotConfig,
+  getStatsConfig,
   getStylesConfig,
 } from '../angular-cli-files/models/webpack-configs';
-import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { augmentAppWithServiceWorker } from '../angular-cli-files/utilities/service-worker';
@@ -58,6 +58,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<fs.Stats>);
+    const webpackBuilder = new WebpackBuilder({ ...this.context, host });
 
     return of(null).pipe(
       concatMap(() => options.deleteOutputPath
@@ -68,7 +69,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
         options.assets, host, root, projectRoot, builderConfig.sourceRoot)),
       // Replace the assets in options with the normalized version.
       tap((assetPatternObjects => options.assets = assetPatternObjects)),
-      concatMap(() => new Observable(obs => {
+      concatMap(() => {
         // Ensure Build Optimizer is only used with AOT.
         if (options.buildOptimizer && !options.aot) {
           throw new Error('The `--build-optimizer` option cannot be used without `--aot`.');
@@ -79,80 +80,35 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
           webpackConfig = this.buildWebpackConfig(root, projectRoot, host,
             options as NormalizedBrowserBuilderSchema);
         } catch (e) {
-          obs.error(e);
-
-          return;
+          return throwError(e);
         }
-        const webpackCompiler = webpack(webpackConfig);
-        const statsConfig = getWebpackStatsConfig(options.verbose);
 
-        const callback: webpack.compiler.CompilerCallback = (err, stats) => {
-          if (err) {
-            return obs.error(err);
-          }
-
-          const json = stats.toJson(statsConfig);
-          if (options.verbose) {
-            this.context.logger.info(stats.toString(statsConfig));
-          } else {
-            this.context.logger.info(statsToString(json, statsConfig));
-          }
-
-          if (stats.hasWarnings()) {
-            this.context.logger.warn(statsWarningsToString(json, statsConfig));
-          }
-          if (stats.hasErrors()) {
-            this.context.logger.error(statsErrorsToString(json, statsConfig));
-          }
-
-          if (options.watch) {
-            obs.next({ success: !stats.hasErrors() });
-
-            // Never complete on watch mode.
-            return;
-          } else {
-            if (builderConfig.options.serviceWorker) {
-              augmentAppWithServiceWorker(
-                this.context.host,
-                root,
-                projectRoot,
-                resolve(root, normalize(options.outputPath)),
-                options.baseHref || '/',
-                options.ngswConfigPath,
-              ).then(
-                () => {
-                  obs.next({ success: !stats.hasErrors() });
-                  obs.complete();
-                },
-                (err: Error) => {
-                  // We error out here because we're not in watch mode anyway (see above).
-                  obs.error(err);
-                },
-              );
-            } else {
-              obs.next({ success: !stats.hasErrors() });
-              obs.complete();
-            }
-          }
-        };
-
-        try {
-          if (options.watch) {
-            const watching = webpackCompiler.watch({ poll: options.poll }, callback);
-
-            // Teardown logic. Close the watcher when unsubscribed from.
-            return () => watching.close(() => { });
-          } else {
-            webpackCompiler.run(callback);
-          }
-        } catch (err) {
-          if (err) {
-            this.context.logger.error(
-              '\nAn error occured during the build:\n' + ((err && err.stack) || err));
-          }
-          throw err;
+        return webpackBuilder.runWebpack(webpackConfig, getBrowserLoggingCb(options.verbose));
+      }),
+      concatMap(buildEvent => {
+        if (buildEvent.success && !options.watch && options.serviceWorker) {
+          return new Observable(obs => {
+            augmentAppWithServiceWorker(
+              this.context.host,
+              root,
+              projectRoot,
+              resolve(root, normalize(options.outputPath)),
+              options.baseHref || '/',
+              options.ngswConfigPath,
+            ).then(
+              () => {
+                obs.next({ success: true });
+                obs.complete();
+              },
+              (err: Error) => {
+                obs.error(err);
+              },
+            );
+          });
+        } else {
+          return of(buildEvent);
         }
-      })),
+      }),
     );
   }
 
@@ -185,6 +141,7 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
       getCommonConfig(wco),
       getBrowserConfig(wco),
       getStylesConfig(wco),
+      getStatsConfig(wco),
     ];
 
     if (wco.buildOptions.main || wco.buildOptions.polyfills) {
@@ -212,5 +169,23 @@ export class BrowserBuilder implements Builder<BrowserBuilderSchema> {
     );
   }
 }
+
+export const getBrowserLoggingCb = (verbose: boolean): LoggingCallback =>
+  (stats, config, logger) => {
+    // config.stats contains our own stats settings, added during buildWebpackConfig().
+    const json = stats.toJson(config.stats);
+    if (verbose) {
+      logger.info(stats.toString(config.stats));
+    } else {
+      logger.info(statsToString(json, config.stats));
+    }
+
+    if (stats.hasWarnings()) {
+      logger.warn(statsWarningsToString(json, config.stats));
+    }
+    if (stats.hasErrors()) {
+      logger.error(statsErrorsToString(json, config.stats));
+    }
+  };
 
 export default BrowserBuilder;

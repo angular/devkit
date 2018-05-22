@@ -12,28 +12,24 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
+import { WebpackBuilder } from '@angular-devkit/build-webpack';
 import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import { Stats } from 'fs';
 import { Observable, concat, of } from 'rxjs';
 import { concatMap, last } from 'rxjs/operators';
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
-import * as webpack from 'webpack';
 import { WebpackConfigOptions } from '../angular-cli-files/models/build-options';
 import {
   getAotConfig,
   getCommonConfig,
   getNonAotConfig,
   getServerConfig,
+  getStatsConfig,
   getStylesConfig,
 } from '../angular-cli-files/models/webpack-configs';
-import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
-import {
-  statsErrorsToString,
-  statsToString,
-  statsWarningsToString,
-} from '../angular-cli-files/utilities/stats';
+import { getBrowserLoggingCb } from '../browser';
 import { addFileReplacements } from '../utils';
 import { BuildWebpackServerSchema } from './schema';
 const webpackMerge = require('webpack-merge');
@@ -48,6 +44,7 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
     const root = this.context.workspace.root;
     const projectRoot = resolve(root, builderConfig.root);
     const host = new virtualFs.AliasHost(this.context.host as virtualFs.Host<Stats>);
+    const webpackBuilder = new WebpackBuilder({ ...this.context, host });
 
     // TODO: verify using of(null) to kickstart things is a pattern.
     return of(null).pipe(
@@ -55,52 +52,11 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
         ? this._deleteOutputDir(root, normalize(options.outputPath), this.context.host)
         : of(null)),
       concatMap(() => addFileReplacements(root, host, options.fileReplacements)),
-      concatMap(() => new Observable(obs => {
-        // Ensure Build Optimizer is only used with AOT.
+      concatMap(() => {
         const webpackConfig = this.buildWebpackConfig(root, projectRoot, host, options);
-        const webpackCompiler = webpack(webpackConfig);
-        const statsConfig = getWebpackStatsConfig(options.verbose);
 
-        const callback: webpack.compiler.CompilerCallback = (err, stats) => {
-          if (err) {
-            return obs.error(err);
-          }
-
-          const json = stats.toJson(statsConfig);
-          if (options.verbose) {
-            this.context.logger.info(stats.toString(statsConfig));
-          } else {
-            this.context.logger.info(statsToString(json, statsConfig));
-          }
-
-          if (stats.hasWarnings()) {
-            this.context.logger.warn(statsWarningsToString(json, statsConfig));
-          }
-          if (stats.hasErrors()) {
-            this.context.logger.error(statsErrorsToString(json, statsConfig));
-          }
-
-          obs.next({ success: !stats.hasErrors() });
-          obs.complete();
-        };
-
-        try {
-          if (options.watch) {
-            const watching = webpackCompiler.watch({ poll: options.poll }, callback);
-
-            // Teardown logic. Close the watcher when unsubscribed from.
-            return () => watching.close(() => { });
-          } else {
-            webpackCompiler.run(callback);
-          }
-        } catch (err) {
-          if (err) {
-            this.context.logger.error(
-              '\nAn error occured during the build:\n' + ((err && err.stack) || err));
-          }
-          throw err;
-        }
-      })),
+        return webpackBuilder.runWebpack(webpackConfig, getBrowserLoggingCb(options.verbose));
+      }),
     );
   }
 
@@ -145,6 +101,7 @@ export class ServerBuilder implements Builder<BuildWebpackServerSchema> {
       getCommonConfig(wco),
       getServerConfig(wco),
       getStylesConfig(wco),
+      getStatsConfig(wco),
     ];
 
     if (wco.buildOptions.main || wco.buildOptions.polyfills) {

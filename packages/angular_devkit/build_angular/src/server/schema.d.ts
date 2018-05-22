@@ -17,7 +17,7 @@ export interface BuildWebpackServerSchema {
   /**
    * Adds more details to output logging.
    */
-  verbose?: boolean;
+  verbose: boolean;
   /**
    * Use a separate bundle containing code used across multiple bundles.
    */

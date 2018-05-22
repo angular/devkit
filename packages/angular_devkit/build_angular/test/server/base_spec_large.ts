@@ -8,7 +8,7 @@
 
 import { runTargetSpec } from '@angular-devkit/architect/testing';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
-import { tap } from 'rxjs/operators';
+import { take, tap } from 'rxjs/operators';
 import { Timeout, host } from '../utils';
 
 
@@ -58,6 +58,7 @@ describe('Server Builder', () => {
         const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
         expect(content).toMatch(/AppServerModuleNgFactory/);
       }),
+      take(1),
     ).subscribe(undefined, done.fail, done);
   }, Timeout.Standard);
 });

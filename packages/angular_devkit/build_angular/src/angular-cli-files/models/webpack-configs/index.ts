@@ -15,3 +15,4 @@ export * from './styles';
 export * from './test';
 export * from './typescript';
 export * from './utils';
+export * from './stats';

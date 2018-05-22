@@ -11,6 +11,7 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
+import { LoggingCallback, WebpackBuilder } from '@angular-devkit/build-webpack';
 import { Path, getSystemPath, normalize, resolve, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -21,14 +22,13 @@ import { WebpackConfigOptions } from '../angular-cli-files/models/build-options'
 import {
   getAotConfig,
   getCommonConfig,
+  getStatsConfig,
   getStylesConfig,
 } from '../angular-cli-files/models/webpack-configs';
-import { getWebpackStatsConfig } from '../angular-cli-files/models/webpack-configs/utils';
 import { readTsconfig } from '../angular-cli-files/utilities/read-tsconfig';
 import { statsErrorsToString, statsWarningsToString } from '../angular-cli-files/utilities/stats';
 import { NormalizedBrowserBuilderSchema } from '../browser';
 import { BrowserBuilderSchema } from '../browser/schema';
-const MemoryFS = require('memory-fs');
 const webpackMerge = require('webpack-merge');
 
 
@@ -56,12 +56,24 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
     const browserTargetSpec = { project, target: targetName, configuration, overrides };
     const browserBuilderConfig = architect.getBuilderConfiguration<BrowserBuilderSchema>(
       browserTargetSpec);
+    const webpackBuilder = new WebpackBuilder(this.context);
+
+    const loggingCb: LoggingCallback = (stats, config, logger) => {
+      const json = stats.toJson();
+      if (stats.hasWarnings()) {
+        this.context.logger.warn(statsWarningsToString(json, config.stats));
+      }
+
+      if (stats.hasErrors()) {
+        this.context.logger.error(statsErrorsToString(json, config.stats));
+      }
+    };
 
     return architect.getBuilderDescription(browserBuilderConfig).pipe(
       concatMap(browserDescription =>
         architect.validateBuilderOptions(browserBuilderConfig, browserDescription)),
       map(browserBuilderConfig => browserBuilderConfig.options),
-      concatMap((validatedBrowserOptions) => new Observable(obs => {
+      concatMap((validatedBrowserOptions) => {
         const browserOptions = validatedBrowserOptions;
 
         // We need to determine the outFile name so that AngularCompiler can retrieve it.
@@ -84,39 +96,8 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
           styles: [],
         });
 
-        const webpackCompiler = webpack(webpackConfig);
-        webpackCompiler.outputFileSystem = new MemoryFS();
-        const statsConfig = getWebpackStatsConfig();
-
-        const callback: webpack.compiler.CompilerCallback = (err, stats) => {
-          if (err) {
-            return obs.error(err);
-          }
-
-          const json = stats.toJson('verbose');
-          if (stats.hasWarnings()) {
-            this.context.logger.warn(statsWarningsToString(json, statsConfig));
-          }
-
-          if (stats.hasErrors()) {
-            this.context.logger.error(statsErrorsToString(json, statsConfig));
-          }
-
-          obs.next({ success: !stats.hasErrors() });
-
-          obs.complete();
-        };
-
-        try {
-          webpackCompiler.run(callback);
-        } catch (err) {
-          if (err) {
-            this.context.logger.error(
-              '\nAn error occured during the extraction:\n' + ((err && err.stack) || err));
-          }
-          throw err;
-        }
-      })),
+        return webpackBuilder.runWebpack(webpackConfig, loggingCb);
+      }),
     );
   }
 
@@ -143,9 +124,12 @@ export class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
     };
 
     const webpackConfigs: {}[] = [
+      // We don't need to write to disk.
+      { plugins: [new InMemoryOutputPlugin()] },
       getCommonConfig(wco),
       getAotConfig(wco, host, true),
       getStylesConfig(wco),
+      getStatsConfig(wco),
     ];
 
     return webpackMerge(webpackConfigs);
@@ -165,6 +149,16 @@ function getI18nOutfile(format: string) {
     default:
       throw new Error(`Unsupported format "${format}"`);
   }
+}
+
+class InMemoryOutputPlugin {
+  constructor() { }
+
+  apply(compiler: webpack.Compiler): void {
+    // tslint:disable-next-line:no-any
+    compiler.outputFileSystem = new (webpack as any).MemoryOutputFileSystem();
+  }
+
 }
 
 export default ExtractI18nBuilder;

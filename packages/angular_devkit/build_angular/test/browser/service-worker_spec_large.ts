@@ -12,7 +12,7 @@ import { tap } from 'rxjs/operators';
 import { Timeout, browserTargetSpec, host } from '../utils';
 
 
-describe('Browser Builder', () => {
+describe('Browser Builder service worker', () => {
   const manifest = {
     index: '/index.html',
     assetGroups: [
