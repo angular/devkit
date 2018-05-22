@@ -10,6 +10,12 @@ import { tap } from 'rxjs/operators';
 import { host, karmaTargetSpec, runTargetSpec } from '../utils';
 
 
+// TODO: replace this with an "it()" macro that's reusable globally.
+let linuxOnlyIt: typeof it = it;
+if (process.platform.startsWith('win')) {
+  linuxOnlyIt = xit;
+}
+
 describe('Karma Builder', () => {
   beforeEach(done => host.initialize().toPromise().then(done, done.fail));
   afterEach(done => host.restore().toPromise().then(done, done.fail));
@@ -20,7 +26,9 @@ describe('Karma Builder', () => {
     ).toPromise().then(done, done.fail);
   }, 30000);
 
-  it('fails with broken compilation', (done) => {
+  // This test seems to succeed on appveyor but not terminate Karma, leaving the port used
+  // and killing Chrome after 60s. This causes other tests that use Chrome to fail.
+  linuxOnlyIt('fails with broken compilation', (done) => {
     host.writeMultipleFiles({
       'src/app/app.component.spec.ts': '<p> definitely not typescript </p>',
     });
