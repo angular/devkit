@@ -10,6 +10,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { purify } from './purify';
 
+console.warn('purify is deprecated and will be removed in 0.7.0.');
 
 if (process.argv.length < 3 || process.argv.length > 4) {
   throw new Error(`

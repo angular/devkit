@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 // tslint:disable-next-line:no-implicit-dependencies
-import * as webpack from 'webpack';
+import { Compiler, compilation } from 'webpack';
 import { ReplaceSource } from 'webpack-sources';
 import { purifyReplacements } from './purify';
 
@@ -17,9 +17,11 @@ interface Chunk {
 
 export class PurifyPlugin {
   constructor() { }
-  public apply(compiler: webpack.Compiler): void {
-    // tslint:disable-next-line:no-any
-    compiler.plugin('compilation', (compilation: any) => {
+  public apply(compiler: Compiler): void {
+    compiler.plugin('compilation', (compilation: compilation.Compilation) => {
+      // Webpack 4 provides the same functionality as this plugin and TS transformer
+      compilation.warnings.push('PurifyPlugin is deprecated and will be removed in 0.7.0.');
+
       compilation.plugin('optimize-chunk-assets', (chunks: Chunk[], callback: () => void) => {
         chunks.forEach((chunk: Chunk) => {
           chunk.files
