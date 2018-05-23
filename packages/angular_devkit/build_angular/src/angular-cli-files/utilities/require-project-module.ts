@@ -8,11 +8,10 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 
-const resolve = require('resolve');
 
 // Resolve dependencies within the target project.
 export function resolveProjectModule(root: string, moduleName: string) {
-  return resolve.sync(moduleName, { basedir: root });
+  return require.resolve(moduleName, { paths: [root] });
 }
 
 // Require dependencies within the target project.

@@ -18,8 +18,6 @@ import {
 import { buildOptimizerLoader } from './common';
 import { WebpackConfigOptions } from '../build-options';
 
-const SilentError = require('silent-error');
-
 
 const g: any = typeof global !== 'undefined' ? global : {};
 const webpackLoader: string = g['_DevKitIsLocal']
