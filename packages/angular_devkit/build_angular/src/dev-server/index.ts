@@ -111,9 +111,7 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
       // Replace the assets in options with the normalized version.
       tap((assetPatternObjects => browserOptions.assets = assetPatternObjects)),
       concatMap(() => new Observable(obs => {
-        const browserBuilder = new BrowserBuilder(this.context);
-        const webpackConfig = browserBuilder.buildWebpackConfig(
-          root, projectRoot, host, browserOptions as NormalizedBrowserBuilderSchema);
+        const webpackConfig = this.buildWebpackConfig(root, projectRoot, host, browserOptions);
         const statsConfig = getWebpackStatsConfig(browserOptions.verbose);
 
         let webpackDevServerConfig: WebpackDevServerConfigurationOptions;
@@ -231,6 +229,19 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
         // Teardown logic. Close the server when unsubscribed from.
         return () => server.close();
       })));
+  }
+
+  buildWebpackConfig(
+    root: Path,
+    projectRoot: Path,
+    host: virtualFs.Host<fs.Stats>,
+    browserOptions: BrowserBuilderSchema,
+  ) {
+    const browserBuilder = new BrowserBuilder(this.context);
+    const webpackConfig = browserBuilder.buildWebpackConfig(
+      root, projectRoot, host, browserOptions as NormalizedBrowserBuilderSchema);
+
+    return webpackConfig;
   }
 
   private _buildServerConfig(
@@ -464,6 +475,5 @@ export class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     );
   }
 }
-
 
 export default DevServerBuilder;
