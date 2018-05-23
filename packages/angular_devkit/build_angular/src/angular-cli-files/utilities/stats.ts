@@ -7,15 +7,10 @@
  */
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-
-import chalk from 'chalk';
-import { tags } from '@angular-devkit/core';
+import { tags, terminal } from '@angular-devkit/core';
 
 
-// Force basic color support on terminals with no color support.
-// Chalk typings don't have the correct constructor parameters.
-const chalkCtx = new (chalk.constructor as any)(chalk.supportsColor ? {} : { level: 1 });
-const { bold, green, red, reset, white, yellow } = chalkCtx;
+const { bold, green, red, reset, white, yellow } = terminal;
 
 export function formatSize(size: number): string {
   if (size <= 0) {

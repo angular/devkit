@@ -26,8 +26,6 @@ const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const StatsPlugin = require('stats-webpack-plugin');
-const SilentError = require('silent-error');
-const resolve = require('resolve');
 
 /**
  * Enumerate loaders and their dependencies from this file to let the dependency validator
@@ -166,7 +164,7 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     // Set the cache directory to the Build Optimizer dir, so that package updates will delete it.
     const buildOptimizerDir = g['_DevKitIsLocal']
       ? nodeModules
-      : path.dirname(resolve.sync('@angular-devkit/build-optimizer', { basedir: projectRoot }));
+      : path.dirname(require.resolve('@angular-devkit/build-optimizer', { paths: [projectRoot] }));
     const cacheDirectory = path.resolve(buildOptimizerDir, './.cache/');
 
     buildOptimizerUseRule = {
