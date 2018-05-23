@@ -11,7 +11,6 @@
   "dependencies": {
     "@angular-devkit/architect": "0.0.0",
     "@angular-devkit/core": "0.0.0",
-    "resolve": "^1.5.0",
     "rxjs": "^6.0.0"
   },
   "peerDependencies": {

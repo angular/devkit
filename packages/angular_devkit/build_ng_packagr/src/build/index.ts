@@ -19,9 +19,7 @@ import { Observable } from 'rxjs';
 // TODO move this function to architect or somewhere else where it can be imported from.
 // Blatantly copy-pasted from 'require-project-module.ts'.
 function requireProjectModule(root: string, moduleName: string) {
-  const resolve = require('resolve');
-
-  return require(resolve.sync(moduleName, { basedir: root }));
+  return require(require.resolve(moduleName, { paths: [root] }));
 }
 
 
