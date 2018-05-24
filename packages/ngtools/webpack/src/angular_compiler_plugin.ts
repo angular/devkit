@@ -90,6 +90,7 @@ export interface AngularCompilerPluginOptions {
   compilerOptions?: ts.CompilerOptions;
 
   host?: virtualFs.Host<fs.Stats>;
+  platformTransformers?: ts.TransformerFactory<ts.SourceFile>[];
 }
 
 export enum PLATFORM {
@@ -115,6 +116,7 @@ export class AngularCompilerPlugin {
   private _mainPath: string | undefined;
   private _basePath: string;
   private _transformers: ts.TransformerFactory<ts.SourceFile>[] = [];
+  private _platformTransformers: ts.TransformerFactory<ts.SourceFile>[] | null = null;
   private _platform: PLATFORM;
   private _JitMode = false;
   private _emitSkipped = true;
@@ -258,6 +260,11 @@ export class AngularCompilerPlugin {
     // Process forked type checker options.
     if (options.forkTypeChecker !== undefined) {
       this._forkTypeChecker = options.forkTypeChecker;
+    }
+
+    // Add custom platform transformers.
+    if (options.platformTransformers !== undefined) {
+      this._platformTransformers = options.platformTransformers;
     }
 
     // Create the webpack compiler host.
@@ -757,25 +764,29 @@ export class AngularCompilerPlugin {
       this._transformers.push(removeDecorators(isAppPath, getTypeChecker));
     }
 
-    if (this._platform === PLATFORM.Browser) {
-      // If we have a locale, auto import the locale data file.
-      // This transform must go before replaceBootstrap because it looks for the entry module
-      // import, which will be replaced.
-      if (this._normalizedLocale) {
-        this._transformers.push(registerLocaleData(isAppPath, getEntryModule,
-          this._normalizedLocale));
-      }
+    if (this._platformTransformers !== null) {
+      this._transformers.push(...this._platformTransformers);
+    } else {
+      if (this._platform === PLATFORM.Browser) {
+        // If we have a locale, auto import the locale data file.
+        // This transform must go before replaceBootstrap because it looks for the entry module
+        // import, which will be replaced.
+        if (this._normalizedLocale) {
+          this._transformers.push(registerLocaleData(isAppPath, getEntryModule,
+            this._normalizedLocale));
+        }
 
-      if (!this._JitMode) {
-        // Replace bootstrap in browser AOT.
-        this._transformers.push(replaceBootstrap(isAppPath, getEntryModule, getTypeChecker));
-      }
-    } else if (this._platform === PLATFORM.Server) {
-      this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
-      if (!this._JitMode) {
-        this._transformers.push(
-          exportNgFactory(isMainPath, getEntryModule),
-          replaceServerBootstrap(isMainPath, getEntryModule, getTypeChecker));
+        if (!this._JitMode) {
+          // Replace bootstrap in browser AOT.
+          this._transformers.push(replaceBootstrap(isAppPath, getEntryModule, getTypeChecker));
+        }
+      } else if (this._platform === PLATFORM.Server) {
+        this._transformers.push(exportLazyModuleMap(isMainPath, getLazyRoutes));
+        if (!this._JitMode) {
+          this._transformers.push(
+            exportNgFactory(isMainPath, getEntryModule),
+            replaceServerBootstrap(isMainPath, getEntryModule, getTypeChecker));
+        }
       }
     }
   }
