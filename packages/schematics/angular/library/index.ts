@@ -121,9 +121,9 @@ function addDependenciesToPackageJson() {
         '@angular/compiler-cli': latestVersions.Angular,
         '@angular-devkit/build-ng-packagr': latestVersions.DevkitBuildNgPackagr,
         '@angular-devkit/build-angular': latestVersions.DevkitBuildNgPackagr,
-        'ng-packagr': '^3.0.0-rc.2',
-        'tsickle': '>=0.25.5',
-        'tslib': '^1.7.1',
+        'ng-packagr': '^3.0.0',
+        'tsickle': '>=0.29.0',
+        'tslib': '^1.9.0',
         'typescript': latestVersions.TypeScript,
         // De-structure last keeps existing user dependencies.
         ...json.devDependencies,
