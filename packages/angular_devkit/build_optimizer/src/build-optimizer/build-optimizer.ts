@@ -37,19 +37,7 @@ const whitelistedAngularModules = [
   /[\\/]node_modules[\\/]@angular[\\/]cdk[\\/]/,
 ];
 
-// TODO: this code is very fragile and should be reworked.
-//       See: https://github.com/angular/devkit/issues/523
-const es5AngularModules = [
-  // Angular 4 packaging format has .es5.js as the extension.
-  /\.es5\.js$/, // Angular 4
-  // Angular 5 has esm5 folders.
-  // Angular 6 has fesm5 folders.
-  /[\\/]node_modules[\\/]@angular[\\/][^\\/]+[\\/]f?esm5[\\/]/,
-  // All Angular versions have UMD with es5.
-  /\.umd\.js$/,
-];
-
-// Factories created by AOT are known to have no side effects and contain es5 code.
+// Factories created by AOT are known to have no side effects.
 // In Angular 2/4 the file path for factories can be `.ts`, but in Angular 5 it is `.js`.
 const ngFactories = [
   /\.ngfactory\.[jt]s/,
@@ -57,10 +45,8 @@ const ngFactories = [
 ];
 
 function isKnownSideEffectFree(filePath: string) {
-  return ngFactories.some((re) => re.test(filePath)) || (
-    whitelistedAngularModules.some((re) => re.test(filePath))
-    && es5AngularModules.some((re) => re.test(filePath))
-  );
+  return ngFactories.some((re) => re.test(filePath)) ||
+    whitelistedAngularModules.some((re) => re.test(filePath));
 }
 
 export interface BuildOptimizerOptions {

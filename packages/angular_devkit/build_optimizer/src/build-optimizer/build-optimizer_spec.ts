@@ -89,24 +89,6 @@ describe('build-optimizer', () => {
       });
     });
 
-    it('supports es2015 modules', () => {
-      // prefix-functions would add PURE_IMPORTS_START and PURE to the super call.
-      // This test ensures it isn't applied to es2015 modules.
-      const output = tags.oneLine`
-        import { Injectable } from '@angular/core';
-        class Clazz extends BaseClazz { constructor(e) { super(e); } }
-      `;
-      const input = tags.stripIndent`
-        ${output}
-        Clazz.ctorParameters = () => [ { type: Injectable } ];
-      `;
-
-      const inputFilePath = '/node_modules/@angular/core/@angular/core.js';
-      const boOutput = buildOptimizer({ content: input, inputFilePath });
-      expect(tags.oneLine`${boOutput.content}`).toEqual(output);
-      expect(boOutput.emitSkipped).toEqual(false);
-    });
-
     it('supports flagging module as side-effect free', () => {
       const output = tags.oneLine`
         /** PURE_IMPORTS_START  PURE_IMPORTS_END */
