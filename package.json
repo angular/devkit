@@ -82,7 +82,6 @@
     "ajv": "~6.4.0",
     "autoprefixer": "^8.4.1",
     "bootstrap": "^4.0.0",
-    "cache-loader": "^1.2.2",
     "chalk": "~2.2.2",
     "chokidar": "^2.0.3",
     "circular-dependency-plugin": "^5.0.2",
