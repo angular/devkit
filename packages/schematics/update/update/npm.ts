@@ -120,40 +120,62 @@ export function getNpmPackageJson(
         `Getting package.json from '${packageName}' (url: ${JSON.stringify(fullUrl)})...`,
       );
 
-      return fullUrl.toString();
+      return fullUrl;
     }),
     concatMap(fullUrl => {
-      let maybeRequest = npmPackageJsonCache.get(fullUrl);
+      let maybeRequest = npmPackageJsonCache.get(fullUrl.toString());
       if (maybeRequest) {
         return maybeRequest;
       }
+
+      const registryKey = `//${fullUrl.host}/`;
 
       return concat(
         getNpmConfigOption('proxy'),
         getNpmConfigOption('https-proxy'),
         getNpmConfigOption('strict-ssl'),
         getNpmConfigOption('cafile'),
+        getNpmConfigOption('_auth', registryKey, true),
+        getNpmConfigOption('username', registryKey, true),
+        getNpmConfigOption('password', registryKey, true),
+        getNpmConfigOption('alwaysAuth', registryKey, true),
       ).pipe(
         toArray(),
         concatMap(options => {
+          const [
+            http,
+            https,
+            strictSsl,
+            cafile,
+            token,
+            username,
+            password,
+            alwaysAuth,
+          ] = options;
+
           const subject = new ReplaySubject<NpmRepositoryPackageJson>(1);
 
-          const sslOptions = getNpmClientSslOptions(options[2], options[3]);
+          const sslOptions = getNpmClientSslOptions(strictSsl, cafile);
+
+          let auth;
+          if (token) {
+            auth = { token, alwaysAuth };
+          } else if (username) {
+            auth = { username, password, alwaysAuth };
+          }
 
           const client = new RegistryClient({
-            proxy: {
-              http: options[0],
-              https: options[1],
-            },
+            proxy: { http, https },
             ssl: sslOptions,
           });
           client.log.level = 'silent';
           const params = {
             timeout: 30000,
+            auth,
           };
 
           client.get(
-            fullUrl,
+            fullUrl.toString(),
             params,
             (error: object, data: NpmRepositoryPackageJson) => {
             if (error) {
