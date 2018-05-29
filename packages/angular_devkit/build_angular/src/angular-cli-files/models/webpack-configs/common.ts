@@ -35,7 +35,6 @@ const StatsPlugin = require('stats-webpack-plugin');
  * require('raw-loader')
  * require('url-loader')
  * require('file-loader')
- * require('cache-loader')
  * require('@angular-devkit/build-optimizer')
  */
 
@@ -161,18 +160,8 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
 
   let buildOptimizerUseRule;
   if (buildOptions.buildOptimizer) {
-    // Set the cache directory to the Build Optimizer dir, so that package updates will delete it.
-    const buildOptimizerDir = g['_DevKitIsLocal']
-      ? nodeModules
-      : path.dirname(require.resolve('@angular-devkit/build-optimizer', { paths: [projectRoot] }));
-    const cacheDirectory = path.resolve(buildOptimizerDir, './.cache/');
-
     buildOptimizerUseRule = {
       use: [
-        {
-          loader: 'cache-loader',
-          options: { cacheDirectory }
-        },
         {
           loader: buildOptimizerLoader,
           options: { sourceMap: buildOptions.sourceMap }
