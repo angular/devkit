@@ -7,11 +7,17 @@
  */
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Resolve dependencies within the target project.
 export function resolveProjectModule(root: string, moduleName: string) {
-  return require.resolve(moduleName, { paths: [root] });
+  const rootModules = path.join(root, 'node_modules');
+  if (fs.existsSync(rootModules)) {
+    return require.resolve(moduleName, { paths: [rootModules] });
+  } else {
+    return require.resolve(moduleName, { paths: [root] });
+  }
 }
 
 // Require dependencies within the target project.
