@@ -31,6 +31,10 @@ export interface BuildWebpackServerSchema {
    */
   vendorChunk?: boolean;
   /**
+   * Resolve vendor packages sourcemaps.
+   */
+  vendorSourceMap?: boolean;
+  /**
    * Output in-file eval sourcemaps.
    */
   evalSourceMap?: boolean;

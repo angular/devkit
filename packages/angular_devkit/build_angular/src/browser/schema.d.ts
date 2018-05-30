@@ -67,6 +67,11 @@ export interface BrowserBuilderSchema {
   sourceMap: boolean;
 
   /**
+   * Resolve vendor packages sourcemaps.
+   */
+  vendorSourceMap?: boolean;
+
+  /**
    * Output in-file eval sourcemaps.
    */
   evalSourceMap: boolean;
