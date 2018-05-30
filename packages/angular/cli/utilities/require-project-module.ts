@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 
 // resolve dependencies within the target project
 export function resolveProjectModule(root: string, moduleName: string) {

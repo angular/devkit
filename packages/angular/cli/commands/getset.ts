@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import { Command, Option } from '../models/command';
 
 export interface Options {

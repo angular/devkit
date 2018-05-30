@@ -1,4 +1,4 @@
-// tslint:disable:no-any
+// tslint:disable:no-global-tslint-disable no-any file-header
 import { normalize } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as os from 'os';

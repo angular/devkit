@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import { logging, terminal } from '@angular-devkit/core';
 import { ModuleNotFoundException, resolve } from '@angular-devkit/core/node';
 import { spawn } from 'child_process';

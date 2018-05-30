@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import { tags, terminal } from '@angular-devkit/core';
 import * as path from 'path';
 import { SemVer, satisfies } from 'semver';

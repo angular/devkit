@@ -1,5 +1,6 @@
-// tslint:disable:no-any
+// tslint:disable:no-global-tslint-disable no-any file-header
 import { logging, strings as coreStrings, tags } from '@angular-devkit/core';
+import * as yargsParser from 'yargs-parser';
 import {
   ArgumentStrategy,
   CommandConstructor,
@@ -8,8 +9,6 @@ import {
   Option,
 } from '../models/command';
 import { insideProject } from '../utilities/project';
-
-import * as yargsParser from 'yargs-parser';
 
 
 export interface CommandMap {

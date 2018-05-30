@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import {
   InvalidJsonCharacterException,
   JsonArray,
@@ -247,6 +248,7 @@ export default class ConfigCommand extends Command {
     const [config, configPath] = getWorkspaceRaw(options.global ? 'global' : 'local');
     if (!config || !configPath) {
       this.logger.error('Confguration file cannot be found.');
+
       return 1;
     }
 

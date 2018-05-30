@@ -1,4 +1,4 @@
-// tslint:disable:no-any
+// tslint:disable:no-global-tslint-disable no-any file-header
 import {
   Architect,
   BuildEvent,
@@ -187,7 +187,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
             }
           }
           newErrors.push(schemaError);
-        };
+        }
 
         if (newErrors.length > 0) {
           this.logger.error(new schema.SchemaValidationException(newErrors).message);

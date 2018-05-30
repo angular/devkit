@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import { ArchitectCommand, ArchitectCommandOptions } from '../models/architect-command';
 import { CommandScope, Option } from '../models/command';
 

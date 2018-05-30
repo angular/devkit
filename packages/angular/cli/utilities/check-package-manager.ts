@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import { terminal } from '@angular-devkit/core';
 import { exec } from 'child_process';
 import { promisify } from 'util';

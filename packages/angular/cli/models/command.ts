@@ -1,4 +1,4 @@
-// tslint:disable:no-any
+// tslint:disable:no-global-tslint-disable no-any file-header
 import { logging, terminal } from '@angular-devkit/core';
 
 export interface CommandConstructor {

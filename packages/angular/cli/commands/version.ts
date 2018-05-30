@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import { terminal } from '@angular-devkit/core';
 import * as child_process from 'child_process';
 import * as fs from 'fs';

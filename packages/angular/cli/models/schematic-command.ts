@@ -1,4 +1,4 @@
-// tslint:disable:no-any
+// tslint:disable:no-global-tslint-disable no-any file-header
 import { JsonObject, experimental } from '@angular-devkit/core';
 import { normalize, strings, tags, terminal, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';

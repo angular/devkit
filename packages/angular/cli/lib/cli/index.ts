@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import { logging, terminal } from '@angular-devkit/core';
 import { filter } from 'rxjs/operators';
 import { runCommand } from '../../models/command-runner';

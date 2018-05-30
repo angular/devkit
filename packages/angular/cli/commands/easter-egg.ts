@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import { terminal } from '@angular-devkit/core';
 import { Command, Option } from '../models/command';
 

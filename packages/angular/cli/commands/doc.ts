@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import { Command } from '../models/command';
 const opn = require('opn');
 

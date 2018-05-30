@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import { existsSync } from 'fs';
 import * as path from 'path';
 

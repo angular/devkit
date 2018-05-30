@@ -1,3 +1,4 @@
+// tslint:disable:no-global-tslint-disable file-header
 import {
   Path,
   basename,

@@ -1,10 +1,4 @@
-/**
- * Refer to the angular shematics library to let the dependency validator
- * know it is used..
- *
- * require('@schematics/angular')
- */
-// tslint:disable:no-any
+// tslint:disable:no-global-tslint-disable no-any file-header
 import { schema } from '@angular-devkit/core';
 import {
   Collection,

@@ -1,4 +1,4 @@
-// tslint:disable:no-any
+// tslint:disable:no-global-tslint-disable no-any file-header
 import { normalize } from '@angular-devkit/core';
 import { CommandScope, Option } from '../models/command';
 import { CoreSchematicOptions, SchematicCommand } from '../models/schematic-command';

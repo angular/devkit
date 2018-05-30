@@ -1,8 +1,8 @@
+// tslint:disable:no-global-tslint-disable file-header
 import {
   JsonAstObject,
   JsonObject,
   JsonParseMode,
-  JsonValue,
   experimental,
   normalize,
   parseJson,
@@ -280,7 +280,7 @@ export function getDefaultSchematicCollection(): string {
 export function getSchematicDefaults(
   collection: string,
   schematic: string,
-  project?: string | null
+  project?: string | null,
 ): {} {
   let result = {};
   const fullName = `${collection}:${schematic}`;
