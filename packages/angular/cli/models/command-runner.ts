@@ -1,6 +1,5 @@
 // tslint:disable:no-any
-import { logging, tags } from '@angular-devkit/core';
-import { camelize } from '@angular-devkit/core/src/utils/strings';
+import { logging, strings as coreStrings, tags } from '@angular-devkit/core';
 import {
   ArgumentStrategy,
   CommandConstructor,
@@ -15,6 +14,28 @@ import * as yargsParser from 'yargs-parser';
 
 export interface CommandMap {
   [key: string]: CommandConstructor;
+}
+
+// Based off https://en.wikipedia.org/wiki/Levenshtein_distance
+// No optimization, really.
+function levenshtein(a: string, b: string): number {
+  /* base case: empty strings */
+  if (a.length == 0) {
+    return b.length;
+  }
+  if (b.length == 0) {
+    return a.length;
+  }
+
+  // Test if last characters of the strings match.
+  const cost = a[a.length - 1] == b[b.length - 1] ? 0 : 1;
+
+  /* return minimum of delete char from s, delete char from t, and delete char from both */
+  return Math.min(
+    levenshtein(a.slice(0, -1), b) + 1,
+    levenshtein(a, b.slice(0, -1)) + 1,
+    levenshtein(a.slice(0, -1), b.slice(0, -1)) + cost,
+  );
 }
 
 /**
@@ -42,7 +63,7 @@ export async function runCommand(commandMap: CommandMap,
     ? CommandScope.inProject
     : CommandScope.outsideProject;
 
-  let Cmd: CommandConstructor;
+  let Cmd: CommandConstructor | null;
   Cmd = findCommand(commandMap, commandName);
 
   if (!Cmd && !commandName && (rawOptions.v || rawOptions.version)) {
@@ -56,28 +77,6 @@ export async function runCommand(commandMap: CommandMap,
   }
 
   if (!Cmd) {
-    // Based off https://en.wikipedia.org/wiki/Levenshtein_distance
-    // No optimization, really.
-    function levenshtein(a: string, b: string): number {
-      /* base case: empty strings */
-      if (a.length == 0) {
-        return b.length;
-      }
-      if (b.length == 0) {
-        return a.length;
-      }
-
-      // Test if last characters of the strings match.
-      const cost = a[a.length - 1] == b[b.length - 1] ? 0 : 1;
-
-      /* return minimum of delete char from s, delete char from t, and delete char from both */
-      return Math.min(
-        levenshtein(a.slice(0, -1), b) + 1,
-        levenshtein(a, b.slice(0, -1)) + 1,
-        levenshtein(a.slice(0, -1), b.slice(0, -1)) + cost,
-      );
-    }
-
     const commandsDistance = {} as { [name: string]: number };
     const allCommands = listAllCommandNames(commandMap).sort((a, b) => {
       if (!(a in commandsDistance)) {
@@ -111,7 +110,9 @@ export async function runCommand(commandMap: CommandMap,
   }
 
   if (options.help) {
-    return command.printHelp(options);
+    command.printHelp(options);
+
+    return;
   } else {
     if (command.scope !== undefined && command.scope !== CommandScope.everywhere) {
       if (command.scope !== executionScope) {
@@ -176,7 +177,7 @@ export function parseOptions<T = any>(
   const aliases = cmdOpts.concat()
     .filter(o => o.aliases && o.aliases.length > 0)
     .reduce((aliases: any, opt: Option) => {
-      aliases[opt.name] = opt.aliases
+      aliases[opt.name] = (opt.aliases || [])
         .filter(a => a.length === 1);
 
       return aliases;
@@ -230,7 +231,7 @@ export function parseOptions<T = any>(
   // Remove undefined booleans
   booleans
     .filter(b => parsedOptions[b] === undefined)
-    .map(b => camelize(b))
+    .map(b => coreStrings.camelize(b))
     .forEach(b => delete parsedOptions[b]);
 
   // remove options with dashes.

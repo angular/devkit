@@ -6,9 +6,9 @@ import { requireProjectModule } from '../utilities/require-project-module';
 
 
 export class Version {
-  private _semver: SemVer = null;
-  constructor(private _version: string = null) {
-    this._semver = _version && new SemVer(_version);
+  private _semver: SemVer | null = null;
+  constructor(private _version: string | null = null) {
+    this._semver = _version ? new SemVer(_version) : null;
   }
 
   isAlpha() { return this.qualifier == 'alpha'; }
@@ -16,9 +16,9 @@ export class Version {
   isReleaseCandidate() { return this.qualifier == 'rc'; }
   isKnown() { return this._version !== null; }
 
-  isLocal() { return this.isKnown() && path.isAbsolute(this._version); }
+  isLocal() { return this.isKnown() && this._version && path.isAbsolute(this._version); }
   isGreaterThanOrEqualTo(other: SemVer) {
-    return this._semver.compare(other) >= 0;
+    return this._semver !== null && this._semver.compare(other) >= 0;
   }
 
   get major() { return this._semver ? this._semver.major : 0; }
@@ -111,6 +111,8 @@ export class Version {
         run npm install again.
       `)));
       process.exit(2);
+
+      return;
     }
 
     const versionCombos = [

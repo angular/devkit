@@ -40,15 +40,17 @@ export default class VersionCommand extends Command {
       ? path.resolve(this.project.root, 'node_modules')
       : maybeNodeModules;
 
-    const versions = [
+    const packageNames = [
       ...Object.keys(pkg && pkg['dependencies'] || {}),
       ...Object.keys(pkg && pkg['devDependencies'] || {}),
       ...Object.keys(projPkg && projPkg['dependencies'] || {}),
       ...Object.keys(projPkg && projPkg['devDependencies'] || {}),
+      ];
 
+    if (packageRoot != null) {
       // Add all node_modules and node_modules/@*/*
-      ...fs.readdirSync(packageRoot)
-        .reduce((acc, name) => {
+      const nodePackageNames = fs.readdirSync(packageRoot)
+        .reduce<string[]>((acc, name) => {
           if (name.startsWith('@')) {
             return acc.concat(
               fs.readdirSync(path.resolve(packageRoot, name))
@@ -57,8 +59,12 @@ export default class VersionCommand extends Command {
           } else {
             return acc.concat(name);
           }
-        }, []),
-      ]
+        }, []);
+
+      packageNames.push(...nodePackageNames);
+    }
+
+    const versions = packageNames
       .filter(x => patterns.some(p => p.test(x)))
       .reduce((acc, name) => {
         if (name in acc) {
@@ -114,7 +120,7 @@ export default class VersionCommand extends Command {
       Node: ${process.versions.node}
       OS: ${process.platform} ${process.arch}
       Angular: ${angularCoreVersion}
-      ... ${angularSameAsCore.sort().reduce((acc, name) => {
+      ... ${angularSameAsCore.sort().reduce<string[]>((acc, name) => {
         // Perform a simple word wrap around 60.
         if (acc.length == 0) {
           return [name];
@@ -140,8 +146,8 @@ export default class VersionCommand extends Command {
 
   private getVersion(
     moduleName: string,
-    projectNodeModules: string,
-    cliNodeModules: string,
+    projectNodeModules: string | null,
+    cliNodeModules: string | null,
   ): string {
     try {
       if (projectNodeModules) {

@@ -30,7 +30,7 @@ export default class UpdateCommand extends SchematicCommand {
     if (this.initialized) {
       return;
     }
-    super.initialize(options);
+    await super.initialize(options);
     this.initialized = true;
 
     const schematicOptions = await this.getOptions({

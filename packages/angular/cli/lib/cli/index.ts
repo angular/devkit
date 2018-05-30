@@ -68,7 +68,9 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
   } catch (err) {
     if (err instanceof Error) {
       logger.fatal(err.message);
-      logger.fatal(err.stack);
+      if (err.stack) {
+        logger.fatal(err.stack);
+      }
     } else if (typeof err === 'string') {
       logger.fatal(err);
     } else if (typeof err === 'number') {
@@ -82,7 +84,9 @@ export default async function(options: { testing?: boolean, cliArgs: string[] })
       throw err;
     }
 
-    loggingSubscription.unsubscribe();
+    if (loggingSubscription) {
+      loggingSubscription.unsubscribe();
+    }
 
     return 1;
   }

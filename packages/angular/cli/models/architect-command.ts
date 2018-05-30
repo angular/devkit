@@ -82,7 +82,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
     if (!options.project && this.target) {
       const projectNames = this.getProjectNamesByTarget(this.target);
       const { overrides } = this._makeTargetSpecifier(options);
-      if (projectNames.length > 1 && Object.keys(overrides).length > 0) {
+      if (projectNames.length > 1 && Object.keys(overrides || {}).length > 0) {
         throw new Error('Architect commands with multiple targets cannot specify overrides.'
           + `'${this.target}' would be run on the following projects: ${projectNames.join()}`);
       }
@@ -166,34 +166,36 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
       if (!targetSpec.project && this.target) {
         // This runs each target sequentially.
         // Running them in parallel would jumble the log messages.
-        return await from(this.getProjectNamesByTarget(this.target)).pipe(
+        return from(this.getProjectNamesByTarget(this.target)).pipe(
           concatMap(project => runSingleTarget({ ...targetSpec, project })),
           toArray(),
         ).toPromise().then(results => results.every(res => res === 0) ? 0 : 1);
       } else {
-        return await runSingleTarget(targetSpec).toPromise();
+        return runSingleTarget(targetSpec).toPromise();
       }
     } catch (e) {
       if (e instanceof schema.SchemaValidationException) {
         const newErrors: schema.SchemaValidatorError[] = [];
-        e.errors.forEach(schemaError => {
+        for (const schemaError of e.errors) {
           if (schemaError.keyword === 'additionalProperties') {
             const unknownProperty = schemaError.params.additionalProperty;
             if (unknownProperty in options) {
               const dashes = unknownProperty.length === 1 ? '-' : '--';
               this.logger.fatal(`Unknown option: '${dashes}${unknownProperty}'`);
 
-              return 1;
+              break;
             }
           }
           newErrors.push(schemaError);
-        });
+        };
 
         if (newErrors.length > 0) {
           this.logger.error(new schema.SchemaValidationException(newErrors).message);
 
           return 1;
         }
+
+        return 0;
       } else {
         throw e;
       }
@@ -203,7 +205,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
   private getProjectNamesByTarget(targetName: string): string[] {
     const allProjectsForTargetName = this._workspace.listProjectNames().map(projectName =>
       this._architect.listProjectTargets(projectName).includes(targetName) ? projectName : null,
-    ).filter(x => !!x);
+    ).filter(x => !!x) as string[];
 
     if (this.multiTarget) {
       // For multi target commands, we always list all projects that have the target.
@@ -262,6 +264,13 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
       delete overrides.configuration;
       delete overrides.prod;
       delete overrides.project;
+    }
+
+    if (!project) {
+      throw new Error('No project specified');
+    }
+    if (!target) {
+      throw new Error('No project target specified');
     }
 
     return {

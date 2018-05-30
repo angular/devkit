@@ -102,7 +102,7 @@ export function getWorkspaceRaw(
     }
   }
 
-  let content;
+  let content = '';
   new NodeJsSyncHost().read(normalize(configPath))
     .subscribe(data => content = virtualFs.fileBufferToString(data));
 
@@ -115,7 +115,7 @@ export function getWorkspaceRaw(
   return [ast as JsonAstObject, configPath];
 }
 
-export function validateWorkspace(json: JsonValue) {
+export function validateWorkspace(json: JsonObject) {
   const workspace = new experimental.workspace.Workspace(
     normalize('.'),
     new NodeJsSyncHost(),
@@ -277,7 +277,11 @@ export function getDefaultSchematicCollection(): string {
   return '@schematics/angular';
 }
 
-export function getSchematicDefaults(collection: string, schematic: string, project?: string): {} {
+export function getSchematicDefaults(
+  collection: string,
+  schematic: string,
+  project?: string | null
+): {} {
   let result = {};
   const fullName = `${collection}:${schematic}`;
 

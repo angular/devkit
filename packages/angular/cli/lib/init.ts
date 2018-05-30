@@ -43,7 +43,7 @@ function _fromPackageJson(cwd?: string) {
 if (process.env['NG_CLI_PROFILING']) {
   const profiler = require('v8-profiler'); // tslint:disable-line:no-implicit-dependencies
   profiler.startProfiling();
-  function exitHandler(options: { cleanup: boolean, exit: boolean }, _err: Error) {
+  const exitHandler = (options: { cleanup?: boolean, exit?: boolean }) => {
     if (options.cleanup) {
       const cpuProfile = profiler.stopProfiling();
       fs.writeFileSync(path.resolve(process.cwd(), process.env.NG_CLI_PROFILING) + '.cpuprofile',
@@ -53,11 +53,11 @@ if (process.env['NG_CLI_PROFILING']) {
     if (options.exit) {
       process.exit();
     }
-  }
+  };
 
-  process.on('exit', exitHandler.bind(null, { cleanup: true }));
-  process.on('SIGINT', exitHandler.bind(null, { exit: true }));
-  process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
+  process.on('exit', () => exitHandler({ cleanup: true }));
+  process.on('SIGINT', () => exitHandler({ exit: true }));
+  process.on('uncaughtException', () => exitHandler({ exit: true }));
 }
 
 let cli;

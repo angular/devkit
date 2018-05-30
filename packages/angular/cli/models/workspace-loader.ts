@@ -64,13 +64,13 @@ export class WorkspaceLoader {
     return of(null);
   }
 
-  private _loadWorkspaceFromPath(workspacePath: Path) {
+  private _loadWorkspaceFromPath(workspacePath: Path | null) {
     if (!workspacePath) {
       return of(null);
     }
 
     if (this._workspaceCacheMap.has(workspacePath)) {
-      return of(this._workspaceCacheMap.get(workspacePath));
+      return of(this._workspaceCacheMap.get(workspacePath) || null);
     }
 
     const workspaceRoot = dirname(workspacePath);

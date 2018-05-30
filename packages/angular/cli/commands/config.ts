@@ -45,6 +45,9 @@ function parseJsonPath(path: string): string[] {
 
   while (fragments.length > 0) {
     const fragment = fragments.shift();
+    if (fragment == undefined) {
+      break;
+    }
 
     const match = fragment.match(/([^\[]+)((\[.*\])*)/);
     if (!match) {
@@ -242,11 +245,15 @@ export default class ConfigCommand extends Command {
     }
 
     const [config, configPath] = getWorkspaceRaw(options.global ? 'global' : 'local');
+    if (!config || !configPath) {
+      this.logger.error('Confguration file cannot be found.');
+      return 1;
+    }
 
     // TODO: Modify & save without destroying comments
     const configValue = config.value;
 
-    const value = normalizeValue(options.value, options.jsonPath);
+    const value = normalizeValue(options.value || '', options.jsonPath);
     const result = setValueFromPath(configValue, options.jsonPath, value);
 
     if (result === undefined) {

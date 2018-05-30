@@ -27,6 +27,8 @@ export default class DocCommand extends Command {
 
       return false;
     }
+
+    return true;
   }
 
   public async run(options: Options) {
