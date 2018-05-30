@@ -296,12 +296,6 @@ export class CoreSchemaRegistry implements SchemaRegistry {
         modifying: true,
         async: true,
         compile: (schema, _parentSchema, it) => {
-          const source = this._sourceMap.get((schema as JsonObject).$source as string);
-
-          if (!source) {
-            throw new Error(`Invalid source: ${JSON.stringify(source)}.`);
-          }
-
           // We cheat, heavily.
           this._smartDefaultRecord.set(
             // tslint:disable-next-line:no-any
@@ -384,11 +378,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           const fragments = JSON.parse(pointer);
           const source = this._sourceMap.get((schema as JsonObject).$source as string);
 
-          if (!source) {
-            throw new Error('Invalid source.');
-          }
+          let value = source ? source(schema) : observableOf(undefined);
 
-          let value = source(schema);
           if (!isObservable(value)) {
             value = observableOf(value);
           }
