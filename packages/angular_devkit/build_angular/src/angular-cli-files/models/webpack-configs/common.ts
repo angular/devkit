@@ -158,6 +158,17 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
     extraPlugins.push(new StatsPlugin('stats.json', 'verbose'));
   }
 
+  let sourceMapUseRule;
+  if (buildOptions.sourceMap && buildOptions.vendorSourceMap) {
+    sourceMapUseRule = {
+      use: [
+        {
+          loader: 'source-map-loader'
+        }
+      ]
+    }
+  }
+
   let buildOptimizerUseRule;
   if (buildOptions.buildOptimizer) {
     buildOptimizerUseRule = {
@@ -273,6 +284,12 @@ export function getCommonConfig(wco: WebpackConfigOptions) {
         {
           test: /\.js$/,
           ...buildOptimizerUseRule,
+        },
+        {
+          test: /\.js$/,
+          exclude: /(ngfactory|ngstyle).js$/,
+          enforce: 'pre',
+          ...sourceMapUseRule,
         },
       ]
     },
