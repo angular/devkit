@@ -25,6 +25,7 @@ export * from './rules/template';
 export * from './rules/url';
 export * from './tree/delegate';
 export * from './tree/empty';
+export * from './tree/host-tree';
 export * from './tree/filesystem';
 export * from './tree/virtual';
 export {UpdateRecorder} from './tree/interface';

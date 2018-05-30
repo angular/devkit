@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { of as observableOf } from 'rxjs';
+import { last, map } from 'rxjs/operators';
 import { Rule, SchematicContext } from '../engine/interface';
-import { Tree } from '../tree/interface';
+import { MergeStrategy, Tree } from '../tree/interface';
 import { branch } from '../tree/static';
 
 
@@ -41,6 +42,15 @@ export function schematic<OptionT extends object>(schematicName: string, options
     const collection = context.schematic.collection;
     const schematic = collection.createSchematic(schematicName, true);
 
-    return schematic.call(options, observableOf(branch(input)), context);
+    return schematic.call(options, observableOf(branch(input)), context).pipe(
+      last(),
+      map(x => {
+        // We allow overwrite conflict here because they're the only merge conflict we particularly
+        // don't want to deal with; the input tree might have an OVERWRITE which the sub
+        input.merge(x, MergeStrategy.AllowOverwriteConflict);
+
+        return input;
+      }),
+    );
   };
 }

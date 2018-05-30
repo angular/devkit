@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { FilteredTree } from './filtered';
+import { HostTree } from './host-tree';
 import { FilePredicate, MergeStrategy, Tree } from './interface';
 import { VirtualTree } from './virtual';
 
@@ -13,10 +14,20 @@ import { VirtualTree } from './virtual';
 export function empty() { return new VirtualTree(); }
 
 export function branch(tree: Tree) {
+  if (tree instanceof HostTree) {
+    return tree.branch();
+  }
+
   return VirtualTree.branch(tree);
 }
 
 export function merge(tree: Tree, other: Tree, strategy: MergeStrategy = MergeStrategy.Default) {
+  if (tree instanceof HostTree) {
+    tree.merge(other, strategy);
+
+    return tree;
+  }
+
   return VirtualTree.merge(tree, other, strategy);
 }
 
@@ -28,5 +39,9 @@ export function partition(tree: Tree, predicate: FilePredicate<boolean>): [Tree,
 }
 
 export function optimize(tree: Tree) {
+  if (tree instanceof HostTree) {
+    return tree;
+  }
+
   return VirtualTree.optimize(tree);
 }

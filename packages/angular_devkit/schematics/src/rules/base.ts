@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Observable, of as observableOf } from 'rxjs';
-import { concatMap, map } from 'rxjs/operators';
+import { concatMap, last, map } from 'rxjs/operators';
 import { FileOperator, Rule, SchematicContext, Source } from '../engine/interface';
 import { FilteredTree } from '../tree/filtered';
 import { FileEntry, FilePredicate, MergeStrategy, Tree } from '../tree/interface';
@@ -81,7 +81,7 @@ export function mergeWith(source: Source, strategy: MergeStrategy = MergeStrateg
   return (tree: Tree, context: SchematicContext) => {
     const result = callSource(source, context);
 
-    return result.pipe(map(other => VirtualTree.merge(tree, other, strategy || context.strategy)));
+    return result.pipe(map(other => staticMerge(tree, other, strategy || context.strategy)));
   };
 }
 
@@ -106,7 +106,10 @@ export function branchAndMerge(rule: Rule, strategy = MergeStrategy.Default): Ru
     const branchedTree = branch(tree);
 
     return callRule(rule, observableOf(branchedTree), context)
-      .pipe(map(t => staticMerge(tree, t, strategy)));
+      .pipe(
+        last(),
+        map(t => staticMerge(tree, t, strategy)),
+      );
   };
 }
 

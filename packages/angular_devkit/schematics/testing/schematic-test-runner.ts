@@ -11,13 +11,13 @@ import { map } from 'rxjs/operators';
 import {
   Collection,
   DelegateTree,
+  HostTree,
   Rule,
   Schematic,
   SchematicContext,
   SchematicEngine,
   TaskConfiguration,
   Tree,
-  VirtualTree,
   formats,
 } from '../src';
 import { callRule } from '../src/rules/call';
@@ -77,7 +77,7 @@ export class SchematicTestRunner {
     tree?: Tree,
   ): Observable<UnitTestTree> {
     const schematic = this._collection.createSchematic(schematicName, true);
-    const host = observableOf(tree || new VirtualTree);
+    const host = observableOf(tree || new HostTree);
     this._engineHost.clearTasks();
 
     return schematic.call(opts || {}, host, { logger: this._logger })
@@ -93,7 +93,7 @@ export class SchematicTestRunner {
 
     let result: UnitTestTree | null = null;
     let error;
-    const host = observableOf(tree || new VirtualTree);
+    const host = observableOf(tree || new HostTree);
     this._engineHost.clearTasks();
 
     schematic.call(opts || {}, host, { logger: this._logger })
@@ -118,7 +118,7 @@ export class SchematicTestRunner {
   ): Observable<UnitTestTree> {
     const externalCollection = this._engine.createCollection(collectionName);
     const schematic = externalCollection.createSchematic(schematicName, true);
-    const host = observableOf(tree || new VirtualTree);
+    const host = observableOf(tree || new HostTree);
     this._engineHost.clearTasks();
 
     return schematic.call(opts || {}, host, { logger: this._logger })
@@ -135,7 +135,7 @@ export class SchematicTestRunner {
     const schematic = externalCollection.createSchematic(schematicName, true);
 
     let result: UnitTestTree | null = null;
-    const host = observableOf(tree || new VirtualTree);
+    const host = observableOf(tree || new HostTree);
     this._engineHost.clearTasks();
 
     schematic.call(opts || {}, host, { logger: this._logger })
