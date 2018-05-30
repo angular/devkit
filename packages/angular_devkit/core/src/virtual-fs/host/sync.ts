@@ -93,7 +93,7 @@ export class SyncDelegateHost<T extends object = {}> {
 
   // Some hosts may not support stat.
   stat(path: Path): Stats<T> | null {
-    const result: Observable<Stats<T>> | null = this._delegate.stat(path);
+    const result: Observable<Stats<T> | null> | null = this._delegate.stat(path);
 
     if (result) {
       return this._doSyncCall(result);

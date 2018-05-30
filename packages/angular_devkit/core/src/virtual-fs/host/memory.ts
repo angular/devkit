@@ -38,7 +38,7 @@ export interface SimpleMemoryHostStats {
 }
 
 export class SimpleMemoryHost implements Host<{}> {
-  protected readonly _cache = new Map<Path, Stats<SimpleMemoryHostStats>>();
+  protected _cache = new Map<Path, Stats<SimpleMemoryHostStats>>();
   private _watchers = new Map<Path, [HostWatchOptions, Subject<HostWatchEvent>][]>();
 
   protected _newDirStats() {
@@ -257,11 +257,11 @@ export class SimpleMemoryHost implements Host<{}> {
     return maybeStats ? maybeStats.isFile() : false;
   }
 
-  protected _stat(path: Path): Stats<SimpleMemoryHostStats> {
+  protected _stat(path: Path): Stats<SimpleMemoryHostStats> | null {
     const maybeStats = this._cache.get(this._toAbsolute(path));
 
     if (!maybeStats) {
-      throw new FileDoesNotExistException(path);
+      return null;
     } else {
       return maybeStats;
     }
@@ -343,8 +343,8 @@ export class SimpleMemoryHost implements Host<{}> {
   }
 
   // Some hosts may not support stat.
-  stat(path: Path): Observable<Stats<{}>> {
-    return new Observable<Stats<{}>>(obs => {
+  stat(path: Path): Observable<Stats<{}> | null> | null {
+    return new Observable<Stats<{}> | null>(obs => {
       obs.next(this._stat(path));
       obs.complete();
     });

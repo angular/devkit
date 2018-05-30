@@ -59,7 +59,7 @@ export interface ReadonlyHost<StatsT extends object = {}> {
   isFile(path: Path): Observable<boolean>;
 
   // Some hosts may not support stats.
-  stat(path: Path): Observable<Stats<StatsT>> | null;
+  stat(path: Path): Observable<Stats<StatsT> | null> | null;
 }
 
 export interface Host<StatsT extends object = {}> extends ReadonlyHost<StatsT> {

@@ -116,7 +116,7 @@ export class TestHost extends SimpleMemoryHost {
 
     return super._isFile(path);
   }
-  protected _stat(path: Path): Stats<SimpleMemoryHostStats> {
+  protected _stat(path: Path): Stats<SimpleMemoryHostStats> | null {
     this._records.push({ kind: 'stat', path });
 
     return super._stat(path);
