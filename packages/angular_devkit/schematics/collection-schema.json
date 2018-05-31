@@ -45,7 +45,7 @@
           "hidden": {
             "type": "boolean",
             "default": false,
-            "description": "Whether or not this schematic should be listed by the tooling. This does not prevent the tooling to run this schematic, just remove it name from listSchematicNames()."
+            "description": "Whether or not this schematic should be listed by the tooling. This does not prevent the tooling to run this schematic, just removes its name from listSchematicNames()."
           },
           "private": {
             "type": "boolean",

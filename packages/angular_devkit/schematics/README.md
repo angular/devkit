@@ -4,29 +4,29 @@
 ## Description
 Schematics are generators that transform an existing filesystem. It can create files, refactor existing files, or move files around.
 
-What distinguish Schematics from other generators, such as Yeoman or Yarn Create, is that schematics are purely descriptive; no changes are applied to the actual filesystem until everything is ready to be committed. There is no side effect, by design, in Schematics.
+What distinguishes Schematics from other generators, such as Yeoman or Yarn Create, is that schematics are purely descriptive; no changes are applied to the actual filesystem until everything is ready to be committed. There is no side effect, by design, in Schematics.
 
 # Glossary
 
 | Term | Description |
 |------|-------------|
-| **Schematics** | A generator that execute descriptive code without side effects on an existing file system. |
+| **Schematics** | A generator that executes descriptive code without side effects on an existing file system. |
 | **Collection** | A list of schematics metadata. Schematics can be referred by name inside a collection. |
 | **Tool**       | The code using the Schematics library. |
 | **Tree**       | A staging area for changes, containing the original file system, and a list of changes to apply to it. |
-| **Rule**       | A function that applies actions to a `Tree`. It returns a new Tree that will contain all transformations to be applied. |
+| **Rule**       | A function that applies actions to a `Tree`. It returns a new `Tree` that will contain all transformations to be applied. |
 | **Source**     | A function that creates an entirely new `Tree` from an empty filesystem. For example, a file source could read files from disk and create a Create Action for each of those.
-| **Action**     | A atomic operation to be validated and committed to a filesystem or a `Tree`. Actions are created by schematics. |
+| **Action**     | An atomic operation to be validated and committed to a filesystem or a `Tree`. Actions are created by schematics. |
 | **Sink**       | The final destination of all `Action`s. |
 
 # Tooling
-Schematics is a library, and does not work by itself. A [reference CLI](https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics_cli/bin/schematics.ts) is available on this repository, but is not published on NPM. This document explain the library usage and the tooling API, but does not go into the tool implementation itself.
+Schematics is a library, and does not work by itself. A [reference CLI](https://github.com/angular/devkit/blob/master/packages/angular_devkit/schematics_cli/bin/schematics.ts) is available on this repository, but is not published on NPM. This document explains the library usage and the tooling API, but does not go into the tool implementation itself.
 
 The tooling is responsible for the following tasks:
 
 1. Create the Schematic Engine, and pass in a Collection and Schematic loader.
 1. Understand and respect the Schematics metadata and dependencies between collections. Schematics can refer to dependencies, and it's the responsibility of the tool to honor those dependencies. The reference CLI uses NPM packages for its collections.
-1. Create the Options object. Options can be anything, but the schematics can specify a JSON Schema that should be respected. The reference CLI, for example, parse the arguments as a JSON object and validate it with the Schema specified by the collection.
+1. Create the Options object. Options can be anything, but the schematics can specify a JSON Schema that should be respected. The reference CLI, for example, parses the arguments as a JSON object and validates it with the Schema specified by the collection.
   1. Schematics provides some JSON Schema formats for validation that tooling should add. These validate paths, html selectors and app names. Please check the reference CLI for how these can be added.
 1. Call the schematics with the original Tree. The tree should represent the initial state of the filesystem. The reference CLI uses the current directory for this.
 1. Create a Sink and commit the result of the schematics to the Sink. Many sinks are provided by the library; FileSystemSink and DryRunSink are examples.
@@ -35,7 +35,7 @@ The tooling is responsible for the following tasks:
 The tooling API is composed of the following pieces:
 
 ## Engine
-The `SchematicEngine` is responsible for loading and constructing `Collection`s and `Schematics`'. When creating an engine, the tooling provides an `EngineHost` interface that understands how to create a `CollectionDescription` from a name, and how to create a `SchematicDescription`.
+The `SchematicEngine` is responsible for loading and constructing `Collection`s and `Schematics`. When creating an engine, the tooling provides an `EngineHost` interface that understands how to create a `CollectionDescription` from a name, and how to create a `SchematicDescription`.
 
 # Schematics (Generators)
 Schematics are generators and part of a `Collection`.
@@ -91,7 +91,6 @@ The schematics library also provides `Rule` factories by default:
 | `pathTemplate<T>(options: T)` | Apply a path template (see the Template section) to the entire `Tree`. |
 | `template<T>(options: T)` | Apply both path and content templates (see the Template section) to the entire `Tree`. |
 | `filter(predicate: FilePredicate<boolean>)` | Returns the input `Tree` with files that do not pass the `FilePredicate`. |
-| `branch
 
 
 # Examples
