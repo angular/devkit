@@ -88,7 +88,7 @@ export default function(args: ChangelogOptions, logger: logging.Logger) {
         commits,
       });
 
-      if (args.stdout) {
+      if (args.stdout || !githubToken) {
         console.log(markdown);
         process.exit(0);
       }
