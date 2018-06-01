@@ -10,8 +10,10 @@ import {
   SchematicContext,
   SchematicsException,
   Tree,
-  branchAndMerge,
+  apply,
   chain,
+  empty,
+  mergeWith,
   move,
   schematic,
 } from '@angular-devkit/schematics';
@@ -53,8 +55,8 @@ export default function (options: NgNewOptions): Rule {
   };
 
   return chain([
-    branchAndMerge(
-      chain([
+    mergeWith(
+      apply(empty(), [
         schematic('workspace', workspaceOptions),
         schematic('application', applicationOptions),
         move(options.directory || options.name),
