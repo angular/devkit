@@ -53,6 +53,17 @@ jobs:
       - run: npm run webdriver-update-circleci
       - run: npm run test-large -- --code-coverage --full
 
+  e2e-cli:
+    <<: *defaults
+    environment:
+      BASH_ENV: ~/.profile
+    resource_class: xlarge
+    parallelism: 4
+    steps:
+      - checkout: *post_checkout
+      - restore_cache: *_root_package_lock_key
+      - run: xvfb-run -a npm run test-cli-e2e -- --nb-shards=${CIRCLE_NODE_TOTAL} --shard=${CIRCLE_NODE_INDEX}
+
   integration:
     <<: *defaults
     steps:
@@ -148,10 +159,14 @@ workflows:
       - integration:
           requires:
             - build
+      - e2e-cli:
+          requires:
+            - build
       - snapshot_publish:
           requires:
             - test
             - build
+            - e2e-cli
           filters:
             branches:
               only: master
