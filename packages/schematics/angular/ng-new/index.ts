@@ -10,10 +10,8 @@ import {
   SchematicContext,
   SchematicsException,
   Tree,
-  apply,
+  branchAndMerge,
   chain,
-  empty,
-  mergeWith,
   move,
   schematic,
 } from '@angular-devkit/schematics';
@@ -55,14 +53,14 @@ export default function (options: NgNewOptions): Rule {
   };
 
   return chain([
-    mergeWith(
-      apply(empty(), [
+    branchAndMerge(
+      chain([
         schematic('workspace', workspaceOptions),
         schematic('application', applicationOptions),
         move(options.directory || options.name),
       ]),
     ),
-    (host: Tree, context: SchematicContext) => {
+    (_host: Tree, context: SchematicContext) => {
       let packageTask;
       if (!options.skipInstall) {
         packageTask = context.addTask(new NodePackageInstallTask(options.directory));

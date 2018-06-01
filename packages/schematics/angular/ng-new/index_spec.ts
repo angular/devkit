@@ -46,4 +46,15 @@ describe('Ng New Schematic', () => {
     const content = tree.readContent('/bar/angular.json');
     expect(content).toMatch(/"prefix": "pre"/);
   });
+
+  it('should set up the app module', () => {
+    const options: NgNewOptions = {
+      name: 'foo',
+      version: '6.0.0',
+    };
+
+    const tree = schematicRunner.runSchematic('ng-new', options);
+    const moduleContent = tree.readContent('/foo/src/app/app.module.ts');
+    expect(moduleContent).toMatch(/declarations:\s*\[\s*AppComponent\s*\]/m);
+  });
 });
