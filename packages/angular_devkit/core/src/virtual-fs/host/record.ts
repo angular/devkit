@@ -74,6 +74,7 @@ export class CordHost extends SimpleMemoryHost {
 
   constructor(protected _back: ReadonlyHost) { super(); }
 
+  get backend(): ReadonlyHost { return this._back; }
   get capabilities(): HostCapabilities {
     // Our own host is always Synchronous, but the backend might not be.
     return {
