@@ -260,7 +260,7 @@ workflow.execute({
     } else if (debug) {
       logger.fatal('An error occured:\n' + err.stack);
     } else {
-      logger.fatal(err.message);
+      logger.fatal(err.stack || err.message);
     }
 
     process.exit(1);
