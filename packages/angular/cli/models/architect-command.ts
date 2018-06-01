@@ -267,10 +267,10 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
     }
 
     if (!project) {
-      throw new Error('No project specified');
+      project = '';
     }
     if (!target) {
-      throw new Error('No project target specified');
+      target = '';
     }
 
     return {
