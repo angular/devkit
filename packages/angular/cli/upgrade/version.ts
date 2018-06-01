@@ -33,9 +33,30 @@ export class Version {
   static assertCompatibleAngularVersion(projectRoot: string) {
     let angularPkgJson;
     let rxjsPkgJson;
+
+    const isInside = (base: string, potential: string): boolean => {
+      const absoluteBase = path.resolve(base);
+      const absolutePotential = path.resolve(potential);
+      const relativePotential = path.relative(absoluteBase, absolutePotential);
+      if (!relativePotential.startsWith('..') && !path.isAbsolute(relativePotential)) {
+        return true;
+      }
+
+      return false;
+    };
+
     try {
-      angularPkgJson = requireProjectModule(projectRoot, '@angular/core/package.json');
-      rxjsPkgJson = requireProjectModule(projectRoot, 'rxjs/package.json');
+      const resolveOptions = { paths: [ path.join(projectRoot, 'node_modules'), projectRoot ] };
+      const angularPackagePath = require.resolve('@angular/core/package.json', resolveOptions);
+      const rxjsPackagePath = require.resolve('rxjs/package.json', resolveOptions);
+
+      if (!isInside(projectRoot, angularPackagePath)
+          || !isInside(projectRoot, rxjsPackagePath)) {
+        throw new Error();
+      }
+
+      angularPkgJson = require(angularPackagePath);
+      rxjsPkgJson = require(rxjsPackagePath);
     } catch {
       console.error(terminal.bold(terminal.red(tags.stripIndents`
         You seem to not be depending on "@angular/core" and/or "rxjs". This is an error.

@@ -59,9 +59,28 @@ if (process.env['NG_CLI_PROFILING']) {
   process.on('uncaughtException', () => exitHandler({ exit: true }));
 }
 
+const isInside = (base: string, potential: string): boolean => {
+  const absoluteBase = path.resolve(base);
+  const absolutePotential = path.resolve(potential);
+  const relativePotential = path.relative(absoluteBase, absolutePotential);
+  if (!relativePotential.startsWith('..') && !path.isAbsolute(relativePotential)) {
+    return true;
+  }
+
+  return false;
+};
+
 let cli;
 try {
-  const projectLocalCli = require.resolve('@angular/cli', { paths: [ process.cwd() ]});
+  const projectLocalCli = require.resolve(
+    '@angular/cli',
+    { paths: [ path.join(process.cwd(), 'node_modules'), process.cwd() ]},
+  );
+
+  const isGlobal = isInside(path.join(__dirname, '..'), projectLocalCli);
+  if (isGlobal) {
+    throw new Error();
+  }
 
   // This was run from a global, check local version.
   const globalVersion = new SemVer(packageJson['version']);
