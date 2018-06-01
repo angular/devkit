@@ -11,7 +11,9 @@ import { FilePredicate, MergeStrategy, Tree } from './interface';
 import { VirtualTree } from './virtual';
 
 
-export function empty() { return new VirtualTree(); }
+export function empty() {
+  return new HostTree();
+}
 
 export function branch(tree: Tree) {
   if (tree instanceof HostTree) {

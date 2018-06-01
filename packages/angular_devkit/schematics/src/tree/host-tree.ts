@@ -16,6 +16,8 @@ import {
   normalize,
   virtualFs,
 } from '@angular-devkit/core';
+import { ReadonlyHost } from '../../../core/src/virtual-fs/host';
+import { CordHostRecord } from '../../../core/src/virtual-fs/host/record';
 import {
   ContentHasMutatedException,
   FileAlreadyExistException,
@@ -99,12 +101,13 @@ export class HostTree implements Tree {
 
   private _dirCache = new Map<Path, HostDirEntry>();
 
+
   [TreeSymbol]() {
     return this;
   }
 
-  constructor(backend: virtualFs.ReadonlyHost<{}> = new virtualFs.Empty()) {
-    this._record = new virtualFs.CordHost(new virtualFs.SafeReadonlyHost(backend));
+  constructor(protected _backend: virtualFs.ReadonlyHost<{}> = new virtualFs.Empty()) {
+    this._record = new virtualFs.CordHost(new virtualFs.SafeReadonlyHost(_backend));
     this._recordSync = new virtualFs.SyncDelegateHost(this._record);
   }
 
@@ -112,8 +115,80 @@ export class HostTree implements Tree {
     return normalize('/' + path);
   }
 
+  protected _willCreate(path: Path) {
+    let current: ReadonlyHost = this._record;
+    while (current && current != this._backend) {
+      if (!(current instanceof virtualFs.CordHost)) {
+        break;
+      }
+
+      if (current.willCreate(path)) {
+        return true;
+      }
+
+      current = current.backend;
+    }
+
+    return false;
+  }
+  protected _willOverwrite(path: Path) {
+    let current: ReadonlyHost = this._record;
+    while (current && current != this._backend) {
+      if (!(current instanceof virtualFs.CordHost)) {
+        break;
+      }
+
+      if (current.willOverwrite(path)) {
+        return true;
+      }
+
+      current = current.backend;
+    }
+
+    return false;
+  }
+  protected _willDelete(path: Path) {
+    let current: ReadonlyHost = this._record;
+    while (current && current != this._backend) {
+      if (!(current instanceof virtualFs.CordHost)) {
+        break;
+      }
+
+      if (current.willDelete(path)) {
+        return true;
+      }
+
+      current = current.backend;
+    }
+
+    return false;
+  }
+  protected _willRename(path: Path) {
+    let current: ReadonlyHost = this._record;
+    while (current && current != this._backend) {
+      if (!(current instanceof virtualFs.CordHost)) {
+        break;
+      }
+
+      if (current.willRename(path)) {
+        return true;
+      }
+
+      current = current.backend;
+    }
+
+    return false;
+  }
+
+
   branch(): Tree {
-    return new HostTree(this._record);
+    // Freeze our own records, and swap. This is so the branch and this Tree don't share the same
+    // history anymore.
+    const record = this._record;
+    this._record = new virtualFs.CordHost(record);
+    this._recordSync = new virtualFs.SyncDelegateHost(this._record);
+
+    return new HostTree(record);
   }
 
   merge(other: Tree, strategy: MergeStrategy = MergeStrategy.Default): void {
@@ -138,7 +213,7 @@ export class HostTree implements Tree {
         case 'c': {
           const { path, content } = action;
 
-          if ((this._record.willCreate(path) || this._record.willOverwrite(path))) {
+          if ((this._willCreate(path) || this._willOverwrite(path))) {
             if (!creationConflictAllowed) {
               throw new MergeConflictException(path);
             }
@@ -155,7 +230,7 @@ export class HostTree implements Tree {
           const { path, content } = action;
 
           // Ignore if content is the same (considered the same change).
-          if (this._record.willOverwrite(path) && !overwriteConflictAllowed) {
+          if (this._willOverwrite(path) && !overwriteConflictAllowed) {
             throw new MergeConflictException(path);
           }
           // We use write here as merge validation has already been done, and we want to let
@@ -167,7 +242,7 @@ export class HostTree implements Tree {
 
         case 'r': {
           const { path, to } = action;
-          if (this._record.willRename(path)) {
+          if (this._willRename(path)) {
             // No override possible for renaming.
             throw new MergeConflictException(path);
           }
@@ -178,7 +253,7 @@ export class HostTree implements Tree {
 
         case 'd': {
           const { path } = action;
-          if (this._record.willDelete(path) && !deleteConflictAllowed) {
+          if (this._willDelete(path) && !deleteConflictAllowed) {
             throw new MergeConflictException(path);
           }
           this._recordSync.delete(path);
@@ -235,7 +310,12 @@ export class HostTree implements Tree {
     return maybeCache;
   }
   visit(visitor: FileVisitor): void {
-    this.root.visit(visitor);
+    const allFiles: [Path, FileEntry | null | undefined][] = [];
+    this.root.visit((path, entry) => {
+      allFiles.push([path, entry]);
+    });
+
+    allFiles.forEach(([path, entry]) => visitor(path, entry));
   }
 
   // Change content of host files.
@@ -290,8 +370,21 @@ export class HostTree implements Tree {
     throw new SchematicsException('Apply not implemented on host trees.');
   }
   get actions(): Action[] {
+    // Create a list of all records until we hit our original backend. This is to support branches
+    // that diverge from each others.
+    const allRecords: CordHostRecord[] = [...this._record.records()];
+    let current = this._record.backend;
+    while (current != this._backend) {
+      if (!(current instanceof virtualFs.CordHost)) {
+        break;
+      }
+
+      allRecords.unshift(...current.records());
+      current = current.backend;
+    }
+
     return clean(
-      this._record.records()
+      allRecords
         .map(record => {
           switch (record.kind) {
             case 'create':
