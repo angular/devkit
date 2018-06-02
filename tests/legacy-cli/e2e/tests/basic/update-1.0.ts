@@ -1,7 +1,7 @@
 import { createProjectFromAsset } from '../../utils/assets';
-import { expectToFail } from '../../utils/utils';
 import { ng } from '../../utils/process';
-import { useCIChrome } from '../../utils/project';
+import { useCIChrome, useCIDefaults } from '../../utils/project';
+import { expectToFail } from '../../utils/utils';
 
 
 export default function () {
@@ -10,6 +10,7 @@ export default function () {
     .then(() => useCIChrome('.'))
     .then(() => expectToFail(() => ng('build')))
     .then(() => ng('update', '@angular/cli'))
+    .then(() => useCIDefaults('one-oh-project'))
     .then(() => ng('generate', 'component', 'my-comp'))
     .then(() => ng('test', '--watch=false'))
     .then(() => ng('lint'))

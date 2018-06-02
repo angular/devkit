@@ -174,14 +174,14 @@ export function useNgVersion(version: string) {
   });
 }
 
-export function useCIDefaults() {
+export function useCIDefaults(projectName = 'test-project') {
   return updateJsonFile('angular.json', workspaceJson => {
     // Disable progress reporting on CI to reduce spam.
-    const appArchitect = workspaceJson.projects['test-project'].architect;
+    const appArchitect = workspaceJson.projects[projectName].architect;
     appArchitect.build.options.progress = false;
     appArchitect.test.options.progress = false;
     // Disable auto-updating webdriver in e2e.
-    const e2eArchitect = workspaceJson.projects['test-project-e2e'].architect;
+    const e2eArchitect = workspaceJson.projects[projectName + '-e2e'].architect;
     e2eArchitect.e2e.options.webdriverUpdate = false;
   })
   .then(() => updateJsonFile('package.json', json => {
@@ -194,8 +194,10 @@ export function useCIDefaults() {
     // webdriver 2.37 matches Chrome 65.0.3325.18100 (latest stable).
     // The webdriver versions for latest stable will need to be manually updated.
     const webdriverVersion = process.env['CIRCLECI'] ? '2.33' : '2.37';
+    const driverOption = process.env['CHROMEDRIVER_VERSION_ARG']
+                         || `--versions.chrome ${webdriverVersion}`;
     json['scripts']['webdriver-update'] = 'webdriver-manager update' +
-      ` --standalone false --gecko false --versions.chrome ${webdriverVersion}`;
+      ` --standalone false --gecko false ${driverOption}`;
   }))
   .then(() => npm('run', 'webdriver-update'));
 }
@@ -212,22 +214,22 @@ export function useCIChrome(projectDir: string) {
         chromeOptions: {
           args: [
             "--enable-logging",
-            "--no-sandbox",
-            ${process.env['TRAVIS'] ? '"--headless", "--disable-gpu"' : ''}
+            // "--no-sandbox",
+            // "--headless"
           ]
         }
     `))
     // Not a problem if the file can't be found.
-    .catch(() => null)
-    .then(() => replaceInFile(`${projectDir}/karma.conf.js`, `browsers: ['Chrome'],`,
-      `browsers: ['ChromeCI'],
-      customLaunchers: {
-        ChromeCI: {
-          base: '${process.env['TRAVIS'] ? 'ChromeHeadless' : 'Chrome'}',
-          flags: ['--no-sandbox']
-        }
-      },
-    `))
+    // .catch(() => null)
+    // .then(() => replaceInFile(`${projectDir}/karma.conf.js`, `browsers: ['Chrome'],`,
+    //   `browsers: ['ChromeCI'],
+    //   customLaunchers: {
+    //     ChromeCI: {
+    //       base: 'ChromeHeadless',
+    //       flags: ['--no-sandbox']
+    //     }
+    //   },
+    // `))
     .catch(() => null);
 }
 
