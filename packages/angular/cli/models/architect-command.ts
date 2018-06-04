@@ -166,12 +166,12 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
       if (!targetSpec.project && this.target) {
         // This runs each target sequentially.
         // Running them in parallel would jumble the log messages.
-        return from(this.getProjectNamesByTarget(this.target)).pipe(
+        return await from(this.getProjectNamesByTarget(this.target)).pipe(
           concatMap(project => runSingleTarget({ ...targetSpec, project })),
           toArray(),
         ).toPromise().then(results => results.every(res => res === 0) ? 0 : 1);
       } else {
-        return runSingleTarget(targetSpec).toPromise();
+        return await runSingleTarget(targetSpec).toPromise();
       }
     } catch (e) {
       if (e instanceof schema.SchemaValidationException) {
@@ -182,8 +182,6 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
             if (unknownProperty in options) {
               const dashes = unknownProperty.length === 1 ? '-' : '--';
               this.logger.fatal(`Unknown option: '${dashes}${unknownProperty}'`);
-
-              break;
             }
           }
           newErrors.push(schemaError);

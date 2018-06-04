@@ -1,9 +1,12 @@
-import { ng } from '../../utils/process';
+import { execAndWaitForOutputToMatch, ng } from '../../utils/process';
+import { expectToFail } from '../../utils/utils';
 
 export default async function() {
-  const { stderr } = await ng('build', '--notanoption');
+  // await expectToFail(() => ng('build', '--notanoption'));
 
-  if (!stderr.match(/Unknown option: '--notanoption'/)) {
-    throw new Error(`Expected "Unknown option:", received "${JSON.stringify(stderr)}".`);
-  }
+  await execAndWaitForOutputToMatch(
+    'ng',
+    [ 'build', '--notanoption' ],
+    /Unknown option: '--notanoption'/,
+  );
 }
