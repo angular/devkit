@@ -43,12 +43,13 @@ export default function () {
     .then(() => ng('generate', 'module', 'test6', '--module', join('sub', 'deep'))
     .then(() => expectFileToMatch(deepSubModulePath,
       /import { Test6Module } from '..\/..\/test6\/test6.module'/))
-    .then(() => expectFileToMatch(deepSubModulePath, /imports: \[(.|\s)*Test6Module(.|\s)*\]/m)))
+    .then(() => expectFileToMatch(deepSubModulePath, /imports: \[(.|\s)*Test6Module(.|\s)*\]/m)));
 
-    .then(() => process.chdir(join(root, 'src', 'app')))
-    .then(() => ng('generate', 'module', 'test7', '--module', 'app.module.ts'))
-    .then(() => process.chdir('..'))
-    .then(() => expectFileToMatch(modulePath,
-      /import { Test7Module } from '.\/test7\/test7.module'/))
-    .then(() => expectFileToMatch(modulePath, /imports: \[(.|\s)*Test7Module(.|\s)*\]/m));
+    // E2E_DISABLE: temporarily disable pending investigation
+    // .then(() => process.chdir(join(root, 'src', 'app')))
+    // .then(() => ng('generate', 'module', 'test7', '--module', 'app.module.ts'))
+    // .then(() => process.chdir('..'))
+    // .then(() => expectFileToMatch(modulePath,
+    //   /import { Test7Module } from '.\/test7\/test7.module'/))
+    // .then(() => expectFileToMatch(modulePath, /imports: \[(.|\s)*Test7Module(.|\s)*\]/m));
 }
