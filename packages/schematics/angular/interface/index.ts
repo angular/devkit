@@ -8,7 +8,6 @@
 import { strings } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   apply,
@@ -26,7 +25,7 @@ import { Schema as InterfaceOptions } from './schema';
 
 
 export default function (options: InterfaceOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return (host: Tree) => {
     const workspace = getWorkspace(host);
     if (!options.project) {
       throw new SchematicsException('Option (project) is required.');
@@ -56,6 +55,6 @@ export default function (options: InterfaceOptions): Rule {
       branchAndMerge(chain([
         mergeWith(templateSource),
       ])),
-    ])(host, context);
+    ]);
   };
 }

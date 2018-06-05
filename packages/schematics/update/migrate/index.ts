@@ -59,7 +59,7 @@ export default function(options: PostUpdateSchema): Rule {
     if (schematicsToRun.length > 0) {
       const rules = schematicsToRun.map(x => externalSchematic(options.collection, x.name, {}));
 
-      return chain(rules)(tree, context);
+      return chain(rules);
     }
 
     return tree;

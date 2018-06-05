@@ -8,7 +8,6 @@
 import { strings } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   apply,
@@ -25,7 +24,7 @@ import { buildDefaultPath } from '../utility/project';
 import { Schema as ServiceOptions } from './schema';
 
 export default function (options: ServiceOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return (host: Tree) => {
     const workspace = getWorkspace(host);
     if (!options.project) {
       throw new SchematicsException('Option (project) is required.');
@@ -50,6 +49,6 @@ export default function (options: ServiceOptions): Rule {
       move(parsedPath.path),
     ]);
 
-    return mergeWith(templateSource)(host, context);
+    return mergeWith(templateSource);
   };
 }

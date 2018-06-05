@@ -251,6 +251,6 @@ export default function (options: UniversalOptions): Rule {
       updateConfigFile(options, tsConfigDirectory),
       wrapBootstrapCall(options),
       addServerTransition(options),
-    ])(host, context);
+    ]);
   };
 }

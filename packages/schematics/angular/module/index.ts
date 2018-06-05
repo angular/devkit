@@ -8,7 +8,6 @@
 import { basename, dirname, normalize, relative, strings } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   apply,
@@ -72,7 +71,7 @@ function addDeclarationToNgModule(options: ModuleOptions): Rule {
 }
 
 export default function (options: ModuleOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return (host: Tree) => {
     const workspace = getWorkspace(host);
     if (!options.project) {
       throw new SchematicsException('Option (project) is required.');
@@ -106,6 +105,6 @@ export default function (options: ModuleOptions): Rule {
         addDeclarationToNgModule(options),
         mergeWith(templateSource),
       ])),
-    ])(host, context);
+    ]);
   };
 }

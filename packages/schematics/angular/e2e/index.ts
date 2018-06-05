@@ -146,7 +146,7 @@ function validateProjectName(projectName: string) {
 }
 
 export default function (options: E2eOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return (host: Tree) => {
     validateProjectName(options.name);
 
     const workspace = getWorkspace(host);
@@ -171,6 +171,6 @@ export default function (options: E2eOptions): Rule {
           }),
           move(appDir),
         ])),
-    ])(host, context);
+    ]);
   };
 }

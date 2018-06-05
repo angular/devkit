@@ -52,6 +52,6 @@ export default function (options: ClassOptions): Rule {
       move(parsedPath.path),
     ]);
 
-    return branchAndMerge(mergeWith(templateSource))(host, context);
+    return branchAndMerge(mergeWith(templateSource));
   };
 }

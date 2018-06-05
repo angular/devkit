@@ -8,7 +8,6 @@
 import { strings } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   apply,
@@ -87,7 +86,7 @@ function addDeclarationToNgModule(options: PipeOptions): Rule {
 }
 
 export default function (options: PipeOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return (host: Tree) => {
     const workspace = getWorkspace(host);
     if (!options.project) {
       throw new SchematicsException('Option (project) is required.');
@@ -114,9 +113,11 @@ export default function (options: PipeOptions): Rule {
       move(parsedPath.path),
     ]);
 
-    return branchAndMerge(chain([
+    return branchAndMerge(
+      chain([
         addDeclarationToNgModule(options),
         mergeWith(templateSource),
-      ]))(host, context);
+      ]),
+    );
   };
 }

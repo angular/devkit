@@ -83,6 +83,9 @@ export function callRule(rule: Rule,
       return observableOf(inputTree);
     } else if (TreeSymbol in result) {
       return observableOf(result as Tree);
+    } else if (typeof result == 'function') {
+      // This is considered a Rule, chain the rule and return its output.
+      return callRule(result, input, context);
     } else if (isObservable(result)) {
       const obs = result as Observable<Tree>;
 

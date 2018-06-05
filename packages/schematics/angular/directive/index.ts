@@ -8,7 +8,6 @@
 import { strings } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   apply,
@@ -103,7 +102,7 @@ function buildSelector(options: DirectiveOptions, projectPrefix: string) {
 }
 
 export default function (options: DirectiveOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return (host: Tree) => {
     const workspace = getWorkspace(host);
     if (!options.project) {
       throw new SchematicsException('Option (project) is required.');
@@ -138,6 +137,6 @@ export default function (options: DirectiveOptions): Rule {
         addDeclarationToNgModule(options),
         mergeWith(templateSource),
       ])),
-    ])(host, context);
+    ]);
   };
 }

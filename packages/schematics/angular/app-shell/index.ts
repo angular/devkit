@@ -176,7 +176,7 @@ function addUniversalTarget(options: AppShellOptions): Rule {
     delete universalOptions.index;
     delete universalOptions.sourceDir;
 
-    return schematic('universal', universalOptions)(host, context);
+    return schematic('universal', universalOptions);
   };
 }
 

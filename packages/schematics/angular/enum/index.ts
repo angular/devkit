@@ -53,6 +53,6 @@ export default function (options: EnumOptions): Rule {
       branchAndMerge(chain([
         mergeWith(templateSource),
       ])),
-    ])(host, context);
+    ]);
   };
 }

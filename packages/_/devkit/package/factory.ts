@@ -8,7 +8,6 @@
 import { JsonAstObject, JsonValue, parseJsonAst } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   Tree,
   UpdateRecorder,
   apply,
@@ -88,18 +87,16 @@ export default function (options: Schema): Rule {
              .replace(/-/g, '_');
 
   // Verify if we need to create a full project, or just add a new schematic.
-  return (tree: Tree, context: SchematicContext) => {
-    const source = apply(url('./project-files'), [
-      template({
-        ...options as object,
-        dot: '.',
-        path,
-      }),
-    ]);
+  const source = apply(url('./project-files'), [
+    template({
+      ...options as object,
+      dot: '.',
+      path,
+    }),
+  ]);
 
-    return chain([
-      mergeWith(source),
-      addPackageToMonorepo(options, path),
-    ])(tree, context);
-  };
+  return chain([
+    mergeWith(source),
+    addPackageToMonorepo(options, path),
+  ]);
 }

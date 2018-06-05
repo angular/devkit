@@ -33,7 +33,7 @@ function addServiceWorker(options: PwaOptions): Rule {
     };
     delete swOptions.title;
 
-    return externalSchematic('@schematics/angular', 'service-worker', swOptions)(host, context);
+    return externalSchematic('@schematics/angular', 'service-worker', swOptions);
   };
 }
 
@@ -153,7 +153,7 @@ function addManifestToAssetsConfig(options: PwaOptions) {
 }
 
 export default function (options: PwaOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return (host: Tree) => {
     const workspace = getWorkspace(host);
     if (!options.project) {
       throw new SchematicsException('Option "project" is required.');
@@ -186,6 +186,6 @@ export default function (options: PwaOptions): Rule {
       ])),
       updateIndexFile(options),
       addManifestToAssetsConfig(options),
-    ])(host, context);
+    ]);
   };
 }

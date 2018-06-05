@@ -59,7 +59,7 @@ function addSchematicToCollectionJson(
   schematicName: string,
   description: JsonObject,
 ): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
+  return (tree: Tree) => {
     const collectionJsonContent = tree.read(collectionPath);
     if (!collectionJsonContent) {
       throw new Error('Invalid collection path: ' + collectionPath);
@@ -150,6 +150,6 @@ export default function (options: Schema): Rule {
         factory: './' + strings.dasherize(options.name) + '/index#' +
           strings.camelize(options.name),
       }),
-    ])(tree, context);
+    ]);
   };
 }

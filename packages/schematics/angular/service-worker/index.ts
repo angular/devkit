@@ -187,6 +187,6 @@ export default function (options: ServiceWorkerOptions): Rule {
       updateConfigFile(options),
       addDependencies(),
       updateAppModule(options),
-    ])(host, context);
+    ]);
   };
 }

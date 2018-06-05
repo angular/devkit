@@ -8,8 +8,6 @@
 import { strings } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
-  Tree,
   apply,
   mergeWith,
   template,
@@ -19,15 +17,12 @@ import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from './schema';
 
 export default function (options: WorkspaceOptions): Rule {
-  return (host: Tree, context: SchematicContext) => {
-
-    return mergeWith(apply(url('./files'), [
-      template({
-        utils: strings,
-        ...options,
-        'dot': '.',
-        latestVersions,
-      }),
-    ]))(host, context);
-  };
+  return mergeWith(apply(url('./files'), [
+    template({
+      utils: strings,
+      ...options,
+      'dot': '.',
+      latestVersions,
+    }),
+  ]));
 }

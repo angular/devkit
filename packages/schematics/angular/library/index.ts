@@ -257,6 +257,6 @@ export default function (options: LibraryOptions): Rule {
           context.addTask(new NodePackageInstallTask());
         }
       },
-    ])(host, context);
+    ]);
   };
 }
