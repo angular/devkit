@@ -12,15 +12,15 @@ import {
   BuilderConfiguration,
   BuilderContext,
 } from '@angular-devkit/architect';
-import { getSystemPath, resolve } from '@angular-devkit/core';
+import { getSystemPath } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import * as glob from 'glob';
 import { Minimatch } from 'minimatch';
 import * as path from 'path';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
+import { concatMap } from 'rxjs/operators';
 import * as tslint from 'tslint'; // tslint:disable-line:no-implicit-dependencies
 import * as ts from 'typescript'; // tslint:disable-line:no-implicit-dependencies
-import { requireProjectModule } from '../angular-cli-files/utilities/require-project-module';
 import { stripBom } from '../angular-cli-files/utilities/strip-bom';
 
 
@@ -36,24 +36,37 @@ export interface TslintBuilderOptions {
   files: string[];
 }
 
-export class TslintBuilder implements Builder<TslintBuilderOptions> {
+export default class TslintBuilder implements Builder<TslintBuilderOptions> {
 
   constructor(public context: BuilderContext) { }
+
+  private async loadTslint() {
+    let tslint;
+    try {
+      tslint = await import('tslint'); // tslint:disable-line:no-implicit-dependencies
+    } catch {
+      throw new Error('Unable to find TSLint.  Ensure TSLint is installed.');
+    }
+
+    const version = tslint.Linter.VERSION && tslint.Linter.VERSION.split('.');
+    if (!version || version.length < 2 || Number(version[0]) < 5 || Number(version[1]) < 5) {
+      throw new Error('TSLint must be version 5.5 or higher.');
+    }
+
+    return tslint;
+  }
 
   run(builderConfig: BuilderConfiguration<TslintBuilderOptions>): Observable<BuildEvent> {
 
     const root = this.context.workspace.root;
     const systemRoot = getSystemPath(root);
-    const projectRoot = resolve(root, builderConfig.root);
     const options = builderConfig.options;
 
     if (!options.tsConfig && options.typeCheck) {
       throw new Error('A "project" must be specified to enable type checking.');
     }
 
-    return new Observable(obs => {
-      const projectTslint = requireProjectModule(
-        getSystemPath(projectRoot), 'tslint') as typeof tslint;
+    return from(this.loadTslint()).pipe(concatMap(projectTslint => new Observable(obs => {
       const tslintConfigPath = options.tslintConfig
         ? path.resolve(systemRoot, options.tslintConfig)
         : null;
@@ -119,7 +132,7 @@ export class TslintBuilder implements Builder<TslintBuilderOptions> {
       obs.next({ success });
 
       return obs.complete();
-    });
+    })));
   }
 }
 
@@ -215,5 +228,3 @@ function getFileContents(
     throw new Error(`Could not read file '${file}'.`);
   }
 }
-
-export default TslintBuilder;
