@@ -10,12 +10,11 @@ export default function() {
     .then(() => expectFileToMatch(modulePath,
       /import { TestDirectiveDirective } from '.\/test-directive.directive'/))
 
-    // E2E_DISABLE: temporarily disable pending investigation
-    // .then(() => process.chdir(join('src', 'app')))
-    // .then(() => ng('generate', 'directive', 'test-directive2', '--module', 'app.module.ts'))
-    // .then(() => process.chdir('../..'))
-    // .then(() => expectFileToMatch(modulePath,
-    //   /import { TestDirective2Directive } from '.\/test-directive2.directive'/))
+    .then(() => process.chdir(join('src', 'app')))
+    .then(() => ng('generate', 'directive', 'test-directive2', '--module', 'app.module.ts'))
+    .then(() => process.chdir('../..'))
+    .then(() => expectFileToMatch(modulePath,
+      /import { TestDirective2Directive } from '.\/test-directive2.directive'/))
 
     // Try to run the unit tests.
     .then(() => ng('build'));

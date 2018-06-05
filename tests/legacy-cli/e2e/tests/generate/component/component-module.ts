@@ -12,12 +12,11 @@ export default function() {
     .then(() => expectFileToMatch(modulePath,
       /import { TestComponentComponent } from '.\/test-component\/test-component.component'/))
 
-    // E2E_DISABLE: temporarily disable pending investigation
-    // .then(() => process.chdir(join(root, 'src', 'app')))
-    // .then(() => ng('generate', 'component', 'test-component2', '--module', 'app.module.ts'))
-    // .then(() => process.chdir('../..'))
-    // .then(() => expectFileToMatch(modulePath,
-    //   /import { TestComponent2Component } from '.\/test-component2\/test-component2.component'/))
+    .then(() => process.chdir(join(root, 'src', 'app')))
+    .then(() => ng('generate', 'component', 'test-component2', '--module', 'app.module.ts'))
+    .then(() => process.chdir('../..'))
+    .then(() => expectFileToMatch(modulePath,
+      /import { TestComponent2Component } from '.\/test-component2\/test-component2.component'/))
 
     // Try to run the unit tests.
     .then(() => ng('build'));

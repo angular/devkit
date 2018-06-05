@@ -6,14 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import 'symbol-observable';
-const isWarningEnabled = require('../utilities/config').isWarningEnabled;
+// symbol polyfill must go first
+// tslint:disable-next-line:ordered-imports import-groups
+import { tags, terminal } from '@angular-devkit/core';
+import { resolve } from '@angular-devkit/core/node';
+import * as fs from 'fs';
+import * as path from 'path';
+import { SemVer } from 'semver';
+import { isWarningEnabled } from '../utilities/config';
 
-const fs = require('fs');
 const packageJson = require('../package.json');
-const path = require('path');
-const stripIndents = require('@angular-devkit/core').tags.stripIndents;
-const yellow = require('@angular-devkit/core').terminal.yellow;
-const SemVer = require('semver').SemVer;
 
 function _fromPackageJson(cwd?: string) {
   cwd = cwd || process.cwd();
@@ -45,8 +47,10 @@ if (process.env['NG_CLI_PROFILING']) {
   const exitHandler = (options: { cleanup?: boolean, exit?: boolean }) => {
     if (options.cleanup) {
       const cpuProfile = profiler.stopProfiling();
-      fs.writeFileSync(path.resolve(process.cwd(), process.env.NG_CLI_PROFILING) + '.cpuprofile',
-        JSON.stringify(cpuProfile));
+      fs.writeFileSync(
+        path.resolve(process.cwd(), process.env.NG_CLI_PROFILING || '') + '.cpuprofile',
+        JSON.stringify(cpuProfile),
+      );
     }
 
     if (options.exit) {
@@ -59,28 +63,16 @@ if (process.env['NG_CLI_PROFILING']) {
   process.on('uncaughtException', () => exitHandler({ exit: true }));
 }
 
-const isInside = (base: string, potential: string): boolean => {
-  const absoluteBase = path.resolve(base);
-  const absolutePotential = path.resolve(potential);
-  const relativePotential = path.relative(absoluteBase, absolutePotential);
-  if (!relativePotential.startsWith('..') && !path.isAbsolute(relativePotential)) {
-    return true;
-  }
-
-  return false;
-};
-
 let cli;
 try {
-  const projectLocalCli = require.resolve(
+  const projectLocalCli = resolve(
     '@angular/cli',
-    { paths: [ path.join(process.cwd(), 'node_modules'), process.cwd() ]},
+    {
+      checkGlobal: false,
+      basedir: process.cwd(),
+      preserveSymlinks: true,
+    },
   );
-
-  const isGlobal = isInside(path.join(__dirname, '..'), projectLocalCli);
-  if (isGlobal) {
-    throw new Error();
-  }
 
   // This was run from a global, check local version.
   const globalVersion = new SemVer(packageJson['version']);
@@ -89,7 +81,7 @@ try {
 
   try {
     localVersion = _fromPackageJson();
-    shouldWarn = localVersion && globalVersion.compare(localVersion) > 0;
+    shouldWarn = localVersion != null && globalVersion.compare(localVersion) > 0;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -97,7 +89,7 @@ try {
   }
 
   if (shouldWarn && isWarningEnabled('versionMismatch')) {
-    const warning = yellow(stripIndents`
+    const warning = terminal.yellow(tags.stripIndents`
     Your global Angular CLI version (${globalVersion}) is greater than your local
     version (${localVersion}). The local Angular CLI version is used.
 
