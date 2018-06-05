@@ -129,7 +129,8 @@
           "url": "https://github.com/angular/devkit/blob/master/packages/angular_devkit/build_webpack/README.md"
         }
       ],
-      "version": "0.0.0"
+      "version": "0.0.0",
+      "snapshotRepo": "angular/angular-devkit-build-webpack-builds"
     },
     "@angular-devkit/core": {
       "name": "Core",
