@@ -182,6 +182,7 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
             if (unknownProperty in options) {
               const dashes = unknownProperty.length === 1 ? '-' : '--';
               this.logger.fatal(`Unknown option: '${dashes}${unknownProperty}'`);
+              continue;
             }
           }
           newErrors.push(schemaError);
@@ -189,11 +190,9 @@ export abstract class ArchitectCommand extends Command<ArchitectCommandOptions> 
 
         if (newErrors.length > 0) {
           this.logger.error(new schema.SchemaValidationException(newErrors).message);
-
-          return 1;
         }
 
-        return 0;
+        return 1;
       } else {
         throw e;
       }
