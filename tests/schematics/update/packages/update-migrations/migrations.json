@@ -1,9 +1,0 @@
-{
-  "schematics": {
-    "1": {
-      "factory": "./v1_5.js",
-      "version": "1.5",
-      "description": "Test."
-    }
-  }
-}
